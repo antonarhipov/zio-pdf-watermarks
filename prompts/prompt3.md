@@ -1,0 +1,1 @@
+Iteratively implement the tasks based on the task list in `docs/tasks.md`. After completing each task, mark it as done by changing the checkbox from [ ] to [x]. Ensure each change aligns with the style guidelines in `.junie/guidelines.md` and the improvement plan in `docs/plan.md`.
