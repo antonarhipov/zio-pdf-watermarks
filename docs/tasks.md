@@ -32,17 +32,17 @@
 - [x] 21. Implement basic error handling for PDF operations <!-- Completed: 2025-08-21 -->
 
 ### Testing Infrastructure
-- [ ] 22. Set up unit testing framework with ScalaTest
-- [ ] 23. Create test fixtures and sample PDF files
-- [ ] 24. Implement tests for PDF loading and validation
-- [ ] 25. Add tests for basic watermark operations
-- [ ] 26. Configure test coverage reporting
+- [x] 22. Set up unit testing framework with ScalaTest <!-- Completed: 2025-08-21 -->
+- [x] 23. Create test fixtures and sample PDF files <!-- Completed: 2025-08-21 -->
+- [x] 24. Implement tests for PDF loading and validation <!-- Completed: 2025-08-21 -->
+- [x] 25. Add tests for basic watermark operations <!-- Completed: 2025-08-21 -->
+- [x] 26. Configure test coverage reporting <!-- Completed: 2025-08-21 -->
 
 ### Command-Line Interface
-- [ ] 27. Create CLI argument parsing for testing
-- [ ] 28. Implement basic watermark application via CLI
-- [ ] 29. Add CLI help and usage documentation
-- [ ] 30. Test CLI functionality with sample files
+- [x] 27. Create CLI argument parsing for testing <!-- Completed: 2025-08-21 -->
+- [x] 28. Implement basic watermark application via CLI <!-- Completed: 2025-08-21 -->
+- [x] 29. Add CLI help and usage documentation <!-- Completed: 2025-08-21 -->
+- [x] 30. Test CLI functionality with sample files <!-- Completed: 2025-08-21 -->
 
 ## Phase 2: Web Interface and Basic Functionality (Weeks 4-6)
 

@@ -27,6 +27,12 @@ lazy val root = (project in file("."))
     Test / fork := true,
     Test / javaOptions += "-Xmx1G",
     
+    // Test coverage settings
+    coverageMinimumStmtTotal := 85,
+    coverageMinimumBranchTotal := 80,
+    coverageFailOnMinimum := false,
+    coverageHighlighting := true,
+    
     // Dependencies
     libraryDependencies ++= Seq(
       // ZIO Core
