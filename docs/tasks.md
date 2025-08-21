@@ -28,8 +28,8 @@
 - [x] 17. Implement PDF file loading and validation using PDFBox <!-- Completed: 2024-08-21 -->
 - [x] 18. Create PDF document manipulation service <!-- Completed: 2024-08-21 -->
 - [x] 19. Implement basic watermark text rendering <!-- Completed: 2024-08-21 -->
-- [ ] 20. Add PDF file format validation
-- [ ] 21. Implement basic error handling for PDF operations
+- [x] 20. Add PDF file format validation <!-- Completed: 2025-08-21 -->
+- [x] 21. Implement basic error handling for PDF operations <!-- Completed: 2025-08-21 -->
 
 ### Testing Infrastructure
 - [ ] 22. Set up unit testing framework with ScalaTest
