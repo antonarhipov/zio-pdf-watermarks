@@ -4,6 +4,7 @@ import com.pdfwatermarks.domain.*
 import com.pdfwatermarks.errors.ErrorPatterns
 import com.pdfwatermarks.logging.{StructuredLogging, PerformanceMonitoring}
 import zio.*
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
@@ -33,7 +34,7 @@ object PdfManipulator {
   def copyDocument(sourceFile: File, targetFile: File): IO[DomainError, File] =
     PerformanceMonitoring.withPerformanceMonitoring("pdf_copy_document") {
       ErrorPatterns.safely {
-        val sourceDoc = PDDocument.load(sourceFile)
+        val sourceDoc = Loader.loadPDF(sourceFile)
         try {
           // Create a new document and copy all pages
           val targetDoc = new PDDocument()
@@ -77,7 +78,7 @@ object PdfManipulator {
   def extractPages(sourceFile: File, targetFile: File, pageNumbers: List[Int]): IO[DomainError, File] =
     PerformanceMonitoring.withPerformanceMonitoring("pdf_extract_pages") {
       ErrorPatterns.safely {
-        val sourceDoc = PDDocument.load(sourceFile)
+        val sourceDoc = Loader.loadPDF(sourceFile)
         try {
           val totalPages = sourceDoc.getNumberOfPages
           
@@ -181,7 +182,7 @@ object PdfManipulator {
             if (!sourceFile.exists()) {
               throw new IllegalArgumentException(s"Source file does not exist: ${sourceFile.getName}")
             }
-            val doc = PDDocument.load(sourceFile)
+            val doc = Loader.loadPDF(sourceFile)
             sourceDocuments += doc
           }
           
@@ -218,7 +219,7 @@ object PdfManipulator {
    */
   def documentToByteArray(file: File): IO[DomainError, Array[Byte]] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         val outputStream = new ByteArrayOutputStream()
         document.save(outputStream)
@@ -241,7 +242,7 @@ object PdfManipulator {
    */
   def documentFromByteArray(bytes: Array[Byte], targetFile: File): IO[DomainError, File] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(bytes)
+      val document = Loader.loadPDF(bytes)
       try {
         document.save(targetFile)
         targetFile
@@ -275,7 +276,7 @@ object PdfManipulator {
           throw new IllegalArgumentException("Rotation must be 90, 180, or 270 degrees")
         }
         
-        val document = PDDocument.load(sourceFile)
+        val document = Loader.loadPDF(sourceFile)
         try {
           val totalPages = document.getNumberOfPages
           val pagesToRotate = pageNumbers.getOrElse((1 to totalPages).toList)
@@ -330,7 +331,7 @@ object PdfManipulator {
           throw new IllegalArgumentException("Scale factors must be positive")
         }
         
-        val document = PDDocument.load(sourceFile)
+        val document = Loader.loadPDF(sourceFile)
         try {
           val totalPages = document.getNumberOfPages
           val pagesToScale = pageNumbers.getOrElse((1 to totalPages).toList)
@@ -374,7 +375,7 @@ object PdfManipulator {
   def optimizeDocument(sourceFile: File, targetFile: File): IO[DomainError, File] =
     PerformanceMonitoring.withPerformanceMonitoring("pdf_optimize_document") {
       ErrorPatterns.safely {
-        val document = PDDocument.load(sourceFile)
+        val document = Loader.loadPDF(sourceFile)
         try {
           // Basic optimization - remove unused resources
           // Note: More sophisticated optimization could be added here
@@ -398,7 +399,7 @@ object PdfManipulator {
    */
   def validateDocumentIntegrity(file: File): IO[DomainError, Map[String, String]] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         val results = scala.collection.mutable.Map[String, String]()
         

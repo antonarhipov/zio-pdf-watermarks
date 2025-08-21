@@ -4,6 +4,7 @@ import com.pdfwatermarks.domain.*
 import com.pdfwatermarks.errors.ErrorPatterns
 import com.pdfwatermarks.logging.{StructuredLogging, PerformanceMonitoring}
 import zio.*
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.common.PDRectangle
@@ -53,7 +54,7 @@ object PdfProcessor {
    */
   def getPageCount(file: File): IO[DomainError, Int] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         val pageCount = document.getNumberOfPages
         if (pageCount <= 0) {
@@ -78,7 +79,7 @@ object PdfProcessor {
    */
   def getPageDimensions(file: File, pageNumber: Int): IO[DomainError, PageDimensions] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         if (pageNumber < 1 || pageNumber > document.getNumberOfPages) {
           throw new IllegalArgumentException(s"Page number $pageNumber is out of range (1-${document.getNumberOfPages})")
@@ -106,7 +107,7 @@ object PdfProcessor {
    */
   def getAllPageDimensions(file: File): IO[DomainError, List[PageDimensions]] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         val pages = (0 until document.getNumberOfPages).map { pageIndex =>
           val page = document.getPage(pageIndex)
@@ -131,7 +132,7 @@ object PdfProcessor {
    */
   def validatePdfIntegrity(file: File): IO[DomainError, Unit] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         // Basic integrity checks
         val pageCount = document.getNumberOfPages
@@ -176,7 +177,7 @@ object PdfProcessor {
    */
   def getPdfMetadata(file: File): IO[DomainError, Map[String, String]] =
     ErrorPatterns.safely {
-      val document = PDDocument.load(file)
+      val document = Loader.loadPDF(file)
       try {
         val info = document.getDocumentInformation
         val metadata = scala.collection.mutable.Map[String, String]()
@@ -306,7 +307,7 @@ object PdfProcessor {
   def checkMemoryAvailability(file: File): IO[DomainError, Unit] =
     for {
       required <- estimateMemoryRequirement(file)
-      available <- ZIO.attemptBlocking(Runtime.getRuntime.freeMemory()).orDie
+      available <- ZIO.attemptBlocking(java.lang.Runtime.getRuntime.freeMemory()).orDie
       _ <- ZIO.cond(
         available > required,
         (),

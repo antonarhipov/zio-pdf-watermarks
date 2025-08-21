@@ -114,7 +114,7 @@ object ErrorHandling {
    * Create an HTTP response from a domain error.
    */
   def toHttpResponse(error: DomainError): Response =
-    Response.json(toErrorResponse(error).toJson).withStatus(toHttpStatus(error))
+    Response.json(toErrorResponse(error).toJson).status(toHttpStatus(error))
 
   /**
    * Format file size in human-readable format.
@@ -143,7 +143,7 @@ object ErrorPatterns {
   /**
    * Generic error handler that logs errors and converts them to HTTP responses.
    */
-  def handleErrors[R, E <: DomainError, A](
+  def handleErrors[R, E <: DomainError, A: JsonEncoder](
     effect: ZIO[R, E, A]
   ): ZIO[R, Nothing, Response] =
     effect.foldZIO(

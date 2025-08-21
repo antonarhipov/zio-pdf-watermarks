@@ -4,10 +4,11 @@ import com.pdfwatermarks.domain.*
 import com.pdfwatermarks.errors.ErrorPatterns
 import com.pdfwatermarks.logging.{StructuredLogging, PerformanceMonitoring}
 import zio.*
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
-import org.apache.pdfbox.pdmodel.font.{PDType1Font, PDFont}
+import org.apache.pdfbox.pdmodel.font.{PDType1Font, PDFont, Standard14Fonts}
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState
 import org.apache.pdfbox.util.Matrix
 import java.io.File
@@ -34,7 +35,7 @@ object WatermarkRenderer {
   def applyWatermarks(sourceFile: File, targetFile: File, config: WatermarkConfig): IO[DomainError, File] =
     PerformanceMonitoring.withPerformanceMonitoring("watermark_apply_all") {
       ErrorPatterns.safely {
-        val document = PDDocument.load(sourceFile)
+        val document = Loader.loadPDF(sourceFile)
         try {
           val totalPages = document.getNumberOfPages
           
@@ -90,7 +91,7 @@ object WatermarkRenderer {
       contentStream.beginText()
       
       // Set font and size
-      val font = PDType1Font.HELVETICA_BOLD
+      val font = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
       contentStream.setFont(font, watermark.fontSize.toFloat)
       
       // Calculate text transformation matrix for positioning and rotation
@@ -145,7 +146,7 @@ object WatermarkRenderer {
     positionConfig match {
       case PositionConfig.Fixed(x, y) => Point(x, y)
       case PositionConfig.Random =>
-        val random = new Random(System.currentTimeMillis() + index)
+        val random = new Random(java.lang.System.currentTimeMillis() + index)
         val margin = 50.0 // Margin from edges
         Point(
           x = margin + random.nextDouble() * (pageDimensions.width - 2 * margin),
@@ -161,7 +162,7 @@ object WatermarkRenderer {
     orientationConfig match {
       case OrientationConfig.Fixed(angle) => angle
       case OrientationConfig.Random =>
-        val random = new Random(System.currentTimeMillis() + index + 1000)
+        val random = new Random(java.lang.System.currentTimeMillis() + index + 1000)
         random.nextDouble() * 360.0
     }
   }
@@ -173,7 +174,7 @@ object WatermarkRenderer {
     fontSizeConfig match {
       case FontSizeConfig.Fixed(size) => size
       case FontSizeConfig.Random(min, max) =>
-        val random = new Random(System.currentTimeMillis() + index + 2000)
+        val random = new Random(java.lang.System.currentTimeMillis() + index + 2000)
         min + random.nextDouble() * (max - min)
     }
   }
@@ -187,7 +188,7 @@ object WatermarkRenderer {
       case ColorConfig.RandomPerLetter =>
         // For now, return a single random color per watermark
         // Individual letter coloring will be implemented in Phase 3
-        val random = new Random(System.currentTimeMillis() + index + 3000)
+        val random = new Random(java.lang.System.currentTimeMillis() + index + 3000)
         new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
     }
   }
@@ -245,7 +246,7 @@ object WatermarkRenderer {
   ): IO[DomainError, File] =
     PerformanceMonitoring.withPerformanceMonitoring("watermark_apply_single") {
       ErrorPatterns.safely {
-        val document = PDDocument.load(sourceFile)
+        val document = Loader.loadPDF(sourceFile)
         try {
           val totalPages = document.getNumberOfPages
           
@@ -419,19 +420,19 @@ object WatermarkRenderer {
    */
   def getFontByName(fontName: String): PDFont = {
     fontName.toLowerCase match {
-      case "helvetica" => PDType1Font.HELVETICA
-      case "helvetica-bold" => PDType1Font.HELVETICA_BOLD
-      case "helvetica-oblique" => PDType1Font.HELVETICA_OBLIQUE
-      case "helvetica-boldoblique" => PDType1Font.HELVETICA_BOLD_OBLIQUE
-      case "times-roman" => PDType1Font.TIMES_ROMAN
-      case "times-bold" => PDType1Font.TIMES_BOLD
-      case "times-italic" => PDType1Font.TIMES_ITALIC
-      case "times-bolditalic" => PDType1Font.TIMES_BOLD_ITALIC
-      case "courier" => PDType1Font.COURIER
-      case "courier-bold" => PDType1Font.COURIER_BOLD
-      case "courier-oblique" => PDType1Font.COURIER_OBLIQUE
-      case "courier-boldoblique" => PDType1Font.COURIER_BOLD_OBLIQUE
-      case _ => PDType1Font.HELVETICA // Default fallback
+      case "helvetica" => new PDType1Font(Standard14Fonts.FontName.HELVETICA)
+      case "helvetica-bold" => new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+      case "helvetica-oblique" => new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE)
+      case "helvetica-boldoblique" => new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD_OBLIQUE)
+      case "times-roman" => new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN)
+      case "times-bold" => new PDType1Font(Standard14Fonts.FontName.TIMES_BOLD)
+      case "times-italic" => new PDType1Font(Standard14Fonts.FontName.TIMES_ITALIC)
+      case "times-bolditalic" => new PDType1Font(Standard14Fonts.FontName.TIMES_BOLD_ITALIC)
+      case "courier" => new PDType1Font(Standard14Fonts.FontName.COURIER)
+      case "courier-bold" => new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD)
+      case "courier-oblique" => new PDType1Font(Standard14Fonts.FontName.COURIER_OBLIQUE)
+      case "courier-boldoblique" => new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD_OBLIQUE)
+      case _ => new PDType1Font(Standard14Fonts.FontName.HELVETICA) // Default fallback
     }
   }
 

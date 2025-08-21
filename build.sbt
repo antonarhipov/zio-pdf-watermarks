@@ -35,6 +35,9 @@ lazy val root = (project in file("."))
       // ZIO HTTP for web server
       "dev.zio" %% "zio-http" % "3.0.0",
       
+      // ZIO JSON for JSON encoding/decoding
+      "dev.zio" %% "zio-json" % "0.7.3",
+      
       // Apache PDFBox for PDF processing
       "org.apache.pdfbox" % "pdfbox" % "3.0.3",
       

@@ -85,7 +85,7 @@ object Layers {
         
         // Apply watermarks (for now, we'll simulate with a placeholder)
         // In a complete implementation, we'd need the actual source file path
-        _ <- ZIO.logWarn("Watermark application needs actual file path - placeholder implementation")
+        _ <- ZIO.logWarning("Watermark application needs actual file path - placeholder implementation")
         result <- ZIO.fail(DomainError.InternalError("Watermark application requires actual file handling - will be completed in Phase 2"))
       } yield outputFile
     }

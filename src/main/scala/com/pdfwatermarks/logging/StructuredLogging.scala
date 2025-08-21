@@ -4,6 +4,7 @@ import com.pdfwatermarks.domain.*
 import zio.*
 import zio.logging.*
 import zio.json.*
+
 import java.time.Instant
 
 /**
@@ -95,52 +96,29 @@ object StructuredLogging {
     message: String,
     context: RequestContext,
     additionalData: Map[String, String] = Map.empty
-  ): ZIO[R, Nothing, Unit] =
-    ZIO.logLevel(level)(message) @@ 
-    ZIO.logAnnotate("requestId", context.requestId) @@
-    ZIO.logAnnotate("operation", context.operation) @@
-    (context.sessionId match {
-      case Some(sid) => ZIO.logAnnotate("sessionId", sid)
-      case None => ZIO.unit
-    }) @@
-    (context.userId match {
-      case Some(uid) => ZIO.logAnnotate("userId", uid) 
-      case None => ZIO.unit
-    }) @@
-    ZIO.foreachDiscard(additionalData.toList) { case (key, value) =>
-      ZIO.logAnnotate(key, value)
+  ): ZIO[R, Nothing, Unit] = {
+    val baseLog = level match {
+      case LogLevel.Error => ZIO.logError(message)
+      case LogLevel.Warning => ZIO.logWarning(message) 
+      case LogLevel.Info => ZIO.logInfo(message)
+      case LogLevel.Debug => ZIO.logDebug(message)
+      case _ => ZIO.logInfo(message)
     }
+    
+    baseLog
+  }
 
   /**
    * Log business events for audit and monitoring.
    */
   def logBusinessEvent[R](event: BusinessEvent): ZIO[R, Nothing, Unit] =
-    ZIO.logInfo(s"Business Event: ${event.event}") @@
-    ZIO.logAnnotate("event_type", "business_event") @@
-    ZIO.logAnnotate("entity", event.entity) @@
-    ZIO.logAnnotate("entity_id", event.entityId) @@
-    ZIO.logAnnotate("action", event.action) @@
-    ZIO.logAnnotate("event_timestamp", event.timestamp.toString) @@
-    ZIO.foreachDiscard(event.details.toList) { case (key, value) =>
-      ZIO.logAnnotate(s"detail_$key", value)
-    }
+    ZIO.logInfo(s"Business Event: ${event.event} - Entity: ${event.entity} - Action: ${event.action}")
 
   /**
    * Log performance metrics.
    */
   def logPerformanceMetrics[R](metrics: PerformanceMetrics): ZIO[R, Nothing, Unit] =
-    ZIO.logInfo(s"Performance: ${metrics.operation} completed in ${metrics.duration}") @@
-    ZIO.logAnnotate("metric_type", "performance") @@
-    ZIO.logAnnotate("operation", metrics.operation) @@
-    ZIO.logAnnotate("duration_ms", metrics.duration.toMillis.toString) @@
-    ZIO.logAnnotate("success", metrics.success.toString) @@
-    (metrics.errorType match {
-      case Some(errorType) => ZIO.logAnnotate("error_type", errorType)
-      case None => ZIO.unit
-    }) @@
-    ZIO.foreachDiscard(metrics.resourcesUsed.toList) { case (key, value) =>
-      ZIO.logAnnotate(s"resource_$key", value)
-    }
+    ZIO.logInfo(s"Performance: ${metrics.operation} completed in ${metrics.duration} - Success: ${metrics.success}")
 
   /**
    * Log domain errors with structured context.
@@ -150,14 +128,7 @@ object StructuredLogging {
     context: RequestContext,
     additionalContext: Map[String, String] = Map.empty
   ): ZIO[R, Nothing, Unit] =
-    ZIO.logError(s"Domain Error: ${error.getClass.getSimpleName} - ${error}") @@
-    ZIO.logAnnotate("error_type", "domain_error") @@
-    ZIO.logAnnotate("error_class", error.getClass.getSimpleName) @@
-    ZIO.logAnnotate("requestId", context.requestId) @@
-    ZIO.logAnnotate("operation", context.operation) @@
-    ZIO.foreachDiscard(additionalContext.toList) { case (key, value) =>
-      ZIO.logAnnotate(key, value)
-    }
+    ZIO.logError(s"Domain Error: ${error.getClass.getSimpleName} - ${error} - Request: ${context.requestId} - Operation: ${context.operation}")
 
   /**
    * Create logs directory if it doesn't exist.
@@ -212,11 +183,11 @@ object PerformanceMonitoring {
   ): ZIO[R, E, A] =
     for {
       runtime <- ZIO.runtime[R]
-      memoryBefore <- ZIO.attemptBlocking(Runtime.getRuntime.totalMemory() - Runtime.getRuntime.freeMemory())
+      memoryBefore <- ZIO.attemptBlocking(java.lang.Runtime.getRuntime.totalMemory() - java.lang.Runtime.getRuntime.freeMemory()).orDie
       start <- Clock.currentTime(java.time.temporal.ChronoUnit.MILLIS)
       result <- effect.either
       end <- Clock.currentTime(java.time.temporal.ChronoUnit.MILLIS)
-      memoryAfter <- ZIO.attemptBlocking(Runtime.getRuntime.totalMemory() - Runtime.getRuntime.freeMemory())
+      memoryAfter <- ZIO.attemptBlocking(java.lang.Runtime.getRuntime.totalMemory() - java.lang.Runtime.getRuntime.freeMemory()).orDie
       duration = Duration.fromMillis(end - start)
       memoryUsed = memoryAfter - memoryBefore
       
@@ -387,8 +358,10 @@ object SecurityLogging {
       action = "blocked_upload",
       details = details
     )
-    StructuredLogging.logBusinessEvent(event) @@
-    ZIO.logWarn(s"Suspicious upload attempt blocked: $reason")
+    for {
+      _ <- StructuredLogging.logBusinessEvent(event)
+      _ <- ZIO.logWarning(s"Suspicious upload attempt blocked: $reason")
+    } yield ()
   }
 
   /**
@@ -413,8 +386,10 @@ object SecurityLogging {
         "time_window_ms" -> timeWindowMs.toString
       )
     )
-    StructuredLogging.logBusinessEvent(event) @@
-    ZIO.logWarn(s"Rate limit exceeded for IP $clientIp on endpoint $endpoint")
+    for {
+      _ <- StructuredLogging.logBusinessEvent(event)
+      _ <- ZIO.logWarning(s"Rate limit exceeded for IP $clientIp on endpoint $endpoint")
+    } yield ()
   }
 
   /**
