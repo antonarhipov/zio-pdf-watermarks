@@ -3,6 +3,8 @@ package com.pdfwatermarks
 
 import zio._
 import zio.logging.backend.SLF4J
+import com.pdfwatermarks.http.HttpServer
+import com.pdfwatermarks.services.Layers
 
 /**
  * Main application entry point for the PDF Watermarking Application.
@@ -16,20 +18,20 @@ object PdfWatermarkApp extends ZIOAppDefault {
   /**
    * Main application logic.
    * 
-   * Currently serves as a placeholder that will be expanded to include:
-   * - Web server startup with ZIO HTTP
+   * Starts the ZIO HTTP server with all configured services:
+   * - Web server with routing and middleware
    * - PDF processing services
-   * - Watermark configuration and application
-   * - File upload/download handling
+   * - Health check endpoints
+   * - CORS configuration for web interface
    */
   override def run: ZIO[Any, Any, Any] =
     for {
       _ <- ZIO.logInfo("Starting PDF Watermarking Application")
-      _ <- ZIO.logInfo("Application initialized successfully")
-      _ <- ZIO.logInfo("Ready to accept requests")
-      // TODO: Add web server startup and service initialization
-      _ <- ZIO.never // Keep application running (will be replaced with actual server)
-    } yield ExitCode.success
+      config = HttpServer.ServerConfig(port = 8080, host = "0.0.0.0")
+      _ <- ZIO.logInfo(s"Configuring HTTP server on ${config.host}:${config.port}")
+      _ <- ZIO.logInfo("Application services initialized successfully")
+      exitCode <- HttpServer.runWithGracefulShutdown(config)
+    } yield exitCode
 
   /**
    * Bootstrap layer providing logging configuration and core services.
