@@ -274,3 +274,46 @@ case class JobStatusResponse(
 )
 
 given JsonCodec[JobStatusResponse] = DeriveJsonCodec.gen[JobStatusResponse]
+
+// ========== Download Models ==========
+
+/**
+ * Download session tracking for progress monitoring (Task 60).
+ */
+case class DownloadSession(
+  sessionId: String,
+  documentId: String,
+  filename: String,
+  fileSize: Long,
+  bytesTransferred: Long,
+  startedAt: Instant,
+  lastActivity: Instant,
+  status: DownloadStatus
+)
+
+/**
+ * Status of a download operation.
+ */
+enum DownloadStatus:
+  case Starting
+  case InProgress
+  case Completed
+  case Failed(reason: String)
+  case Cancelled
+
+/**
+ * Download progress response for HTTP API (Task 60).
+ */
+case class DownloadProgressResponse(
+  sessionId: String,
+  filename: String,
+  fileSize: Long,
+  bytesTransferred: Long,
+  progress: Int, // 0-100 percentage
+  status: String,
+  transferRate: Option[Long] = None, // bytes per second
+  estimatedTimeRemaining: Option[Long] = None, // seconds
+  message: String
+)
+
+given JsonCodec[DownloadProgressResponse] = DeriveJsonCodec.gen[DownloadProgressResponse]

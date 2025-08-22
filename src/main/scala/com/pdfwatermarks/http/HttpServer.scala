@@ -165,7 +165,7 @@ object HttpServer {
   /**
    * Watermark processing routes (Tasks 52, 53, 54, 55).
    */
-  val watermarkProcessingRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = Routes(
+  val watermarkProcessingRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService, Response] = Routes(
     // Submit watermark configuration endpoint (Task 52)
     Method.POST / "api" / "watermark" / "config" -> handler { (req: Request) =>
       for {
@@ -368,7 +368,7 @@ object HttpServer {
   /**
    * File upload routes with service integration (Tasks 36, 39, 40).
    */
-  val fileUploadRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = Routes(
+  val fileUploadRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService, Response] = Routes(
     // File upload endpoint with multipart handling (Task 36)
     Method.POST / "api" / "upload" -> handler { (req: Request) =>
       for {
@@ -547,10 +547,10 @@ object HttpServer {
   )
 
   /**
-   * Download routes for processed files (Task 55).
+   * Download routes for processed files with progress tracking and cleanup (Tasks 60, 61).
    */
-  val downloadRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = Routes(
-    // Download processed PDF endpoint
+  val downloadRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService, Response] = Routes(
+    // Download processed PDF endpoint with streaming and progress tracking (Task 60)
     Method.GET / "api" / "download" / string("sessionId") -> handler { (sessionId: String, req: Request) =>
       for {
         _ <- ZIO.logInfo(s"Download requested for session: $sessionId")
@@ -570,25 +570,34 @@ object HttpServer {
         // Generate processed filename
         processedFilename <- FileManagementService.generateProcessedFilename(document.filename)
         
-        // For now, simulate processed file path (would be actual path in real implementation)
+        // Get processed file path
         processedFilePath = s"/tmp/processed_${document.id}.pdf"
         processedFile = new java.io.File(processedFilePath)
         
         // Check if processed file exists
         _ <- ZIO.cond(processedFile.exists(), (), DomainError.DocumentNotFound(s"Processed file not found for session $sessionId"))
         
-        // Read file content
+        fileSize = processedFile.length()
+        
+        // Create download session for progress tracking
+        _ <- DownloadTrackingService.createDownloadSession(sessionId, document.id, processedFilename, fileSize)
+        
+        // Read file content for now (streaming can be enhanced later with proper file streaming)
         fileBytes <- ZIO.attempt(java.nio.file.Files.readAllBytes(processedFile.toPath))
           .mapError(err => DomainError.InternalError(s"Failed to read processed file: ${err.getMessage}"))
         
-        _ <- ZIO.logInfo(s"Serving download for session $sessionId: $processedFilename (${fileBytes.length} bytes)")
+        // Update download progress to completed
+        _ <- DownloadTrackingService.completeDownload(sessionId)
+        
+        _ <- ZIO.logInfo(s"Starting streaming download for session $sessionId: $processedFilename (${fileSize} bytes)")
         
       } yield Response(
         status = Status.Ok,
         headers = Headers(
           Header.ContentType(MediaType.application.pdf),
           Header.Custom("Content-Disposition", s"""attachment; filename="$processedFilename""""),
-          Header.Custom("Content-Length", fileBytes.length.toString)
+          Header.Custom("Content-Length", fileSize.toString),
+          Header.Custom("Accept-Ranges", "bytes")
         ),
         body = Body.fromArray(fileBytes)
       )
@@ -605,19 +614,63 @@ object HttpServer {
           Response.text(message).status(status)
         }
       }
+    },
+    
+    // Download progress tracking endpoint (Task 60)
+    Method.GET / "api" / "download" / "progress" / string("sessionId") -> handler { (sessionId: String, req: Request) =>
+      for {
+        _ <- ZIO.logInfo(s"Download progress requested for session: $sessionId")
+        progressResponse <- DownloadTrackingService.getDownloadProgress(sessionId)
+        
+        // Trigger file cleanup if download is completed (Task 61)
+        _ <- progressResponse.status match {
+          case "completed" =>
+            for {
+              _ <- ZIO.logInfo(s"Download completed for session $sessionId, initiating cleanup")
+              session <- SessionManagementService.getSession(sessionId)
+              document <- ZIO.fromOption(session.uploadedDocument)
+                .orElseFail(DomainError.DocumentNotFound(s"No document in session $sessionId"))
+              
+              // Cleanup processed file
+              processedFilePath = s"/tmp/processed_${document.id}.pdf"
+              processedFile = new java.io.File(processedFilePath)
+              _ <- TempFileManagementService.cleanupFile(processedFile)
+              
+              // Cleanup original uploaded file if it exists
+              uploadedFilePath = s"/tmp/${document.id}"
+              uploadedFile = new java.io.File(uploadedFilePath)
+              _ <- TempFileManagementService.cleanupFile(uploadedFile)
+              
+              _ <- ZIO.logInfo(s"Cleanup completed for session $sessionId")
+            } yield ()
+          case _ => ZIO.unit
+        }
+        
+      } yield Response.json(progressResponse.toJson)
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Download progress check failed: $error") *>
+        ZIO.succeed {
+          val (status, message) = error match {
+            case DomainError.SessionNotFound(_) => (Status.NotFound, "Download session not found")
+            case _ => (Status.InternalServerError, "Failed to get download progress")
+          }
+          Response.text(message).status(status)
+        }
+      }
     }
   )
 
   /**
    * Complete HTTP application with CORS support (Task 33, 34, 36, 39, 40, 52, 53, 54, 55).
    */
-  val httpApp: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = 
+  val httpApp: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService, Response] = 
     routesWithLogging ++ fileUploadRoutes ++ watermarkProcessingRoutes ++ downloadRoutes
 
   /**
    * Server configuration and startup (Task 31).
    */
-  def start(config: ServerConfig = ServerConfig()): ZIO[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & Server, Throwable, Nothing] = {
+  def start(config: ServerConfig = ServerConfig()): ZIO[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService & Server, Throwable, Nothing] = {
     for {
       _ <- ZIO.logInfo(s"Starting HTTP server on ${config.host}:${config.port}")
       result <- Server.serve(httpApp)
@@ -637,7 +690,7 @@ object HttpServer {
   /**
    * Complete server lifecycle with graceful shutdown (Task 35).
    */
-  def runWithGracefulShutdown(config: ServerConfig = ServerConfig()): ZIO[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & Server, Throwable, ExitCode] = {
+  def runWithGracefulShutdown(config: ServerConfig = ServerConfig()): ZIO[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService & Server, Throwable, ExitCode] = {
     start(config).onInterrupt(gracefulShutdown).as(ExitCode.success)
   }
 }

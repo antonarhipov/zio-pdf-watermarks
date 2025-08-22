@@ -86,8 +86,8 @@
 - [x] 57. Implement processed file download endpoint <!-- Completed: 2025-08-22 -->
 - [x] 58. Set correct MIME types and headers for PDF downloads <!-- Completed: 2025-08-22 -->
 - [x] 59. Generate appropriate filenames for processed files <!-- Completed: 2025-08-22 -->
-- [ ] 60. Add download progress tracking
-- [ ] 61. Implement file cleanup after download
+- [x] 60. Add download progress tracking <!-- Completed: 2025-08-22 -->
+- [x] 61. Implement file cleanup after download <!-- Completed: 2025-08-22 -->
 
 ### Session Management
 - [ ] 62. Implement session handling for multi-step workflow

@@ -136,7 +136,31 @@ object HttpServerTest extends ZIOSpecDefault {
     }
   )
   
-  val testLayer = mockSessionManagementService ++ mockFileManagementService ++ mockPdfProcessingService ++ mockTempFileManagementService
+  val mockDownloadTrackingService = ZLayer.succeed(
+    new DownloadTrackingService {
+      def createDownloadSession(sessionId: String, documentId: String, filename: String, fileSize: Long): UIO[DownloadSession] =
+        ZIO.succeed(DownloadSession(sessionId, documentId, filename, fileSize, 0L, java.time.Instant.now(), java.time.Instant.now(), DownloadStatus.Starting))
+      
+      def getDownloadSession(sessionId: String): IO[DomainError, DownloadSession] =
+        ZIO.succeed(DownloadSession(sessionId, "test-doc", "test.pdf", 1024L, 512L, java.time.Instant.now(), java.time.Instant.now(), DownloadStatus.InProgress))
+      
+      def updateDownloadProgress(sessionId: String, bytesTransferred: Long): IO[DomainError, DownloadSession] =
+        ZIO.succeed(DownloadSession(sessionId, "test-doc", "test.pdf", 1024L, bytesTransferred, java.time.Instant.now(), java.time.Instant.now(), DownloadStatus.InProgress))
+      
+      def completeDownload(sessionId: String): IO[DomainError, DownloadSession] =
+        ZIO.succeed(DownloadSession(sessionId, "test-doc", "test.pdf", 1024L, 1024L, java.time.Instant.now(), java.time.Instant.now(), DownloadStatus.Completed))
+      
+      def failDownload(sessionId: String, reason: String): IO[DomainError, DownloadSession] =
+        ZIO.succeed(DownloadSession(sessionId, "test-doc", "test.pdf", 1024L, 0L, java.time.Instant.now(), java.time.Instant.now(), DownloadStatus.Failed(reason)))
+      
+      def getDownloadProgress(sessionId: String): IO[DomainError, DownloadProgressResponse] =
+        ZIO.succeed(DownloadProgressResponse(sessionId, "test.pdf", 1024L, 512L, 50, "downloading", Some(128L), Some(4L), "Test download progress"))
+      
+      def cleanupDownloadSessions(): UIO[Unit] = ZIO.unit
+    }
+  )
+  
+  val testLayer = mockSessionManagementService ++ mockFileManagementService ++ mockPdfProcessingService ++ mockTempFileManagementService ++ mockDownloadTrackingService
 
   def spec: Spec[Any, Any] = suite("HttpServerTest")(
     suite("Health Check Endpoints")(

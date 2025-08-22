@@ -245,3 +245,84 @@ object ValidationService {
   def validateUpload(uploadInfo: UploadInfo): ZIO[ValidationService, DomainError, Unit] =
     ZIO.serviceWithZIO[ValidationService](_.validateUpload(uploadInfo))
 }
+
+// ========== Download Tracking Service ==========
+
+/**
+ * Service for tracking download progress and managing download sessions (Task 60).
+ */
+trait DownloadTrackingService {
+  /**
+   * Create a new download session for tracking progress.
+   */
+  def createDownloadSession(
+    sessionId: String,
+    documentId: String,
+    filename: String,
+    fileSize: Long
+  ): UIO[DownloadSession]
+  
+  /**
+   * Get download session by ID.
+   */
+  def getDownloadSession(sessionId: String): IO[DomainError, DownloadSession]
+  
+  /**
+   * Update download progress with bytes transferred.
+   */
+  def updateDownloadProgress(
+    sessionId: String,
+    bytesTransferred: Long
+  ): IO[DomainError, DownloadSession]
+  
+  /**
+   * Mark download as completed.
+   */
+  def completeDownload(sessionId: String): IO[DomainError, DownloadSession]
+  
+  /**
+   * Mark download as failed with error reason.
+   */
+  def failDownload(sessionId: String, reason: String): IO[DomainError, DownloadSession]
+  
+  /**
+   * Get download progress response for HTTP API.
+   */
+  def getDownloadProgress(sessionId: String): IO[DomainError, DownloadProgressResponse]
+  
+  /**
+   * Clean up completed or expired download sessions.
+   */
+  def cleanupDownloadSessions(): UIO[Unit]
+}
+
+object DownloadTrackingService {
+  def createDownloadSession(
+    sessionId: String,
+    documentId: String,
+    filename: String,
+    fileSize: Long
+  ): ZIO[DownloadTrackingService, Nothing, DownloadSession] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.createDownloadSession(sessionId, documentId, filename, fileSize))
+    
+  def getDownloadSession(sessionId: String): ZIO[DownloadTrackingService, DomainError, DownloadSession] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.getDownloadSession(sessionId))
+    
+  def updateDownloadProgress(
+    sessionId: String,
+    bytesTransferred: Long
+  ): ZIO[DownloadTrackingService, DomainError, DownloadSession] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.updateDownloadProgress(sessionId, bytesTransferred))
+    
+  def completeDownload(sessionId: String): ZIO[DownloadTrackingService, DomainError, DownloadSession] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.completeDownload(sessionId))
+    
+  def failDownload(sessionId: String, reason: String): ZIO[DownloadTrackingService, DomainError, DownloadSession] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.failDownload(sessionId, reason))
+    
+  def getDownloadProgress(sessionId: String): ZIO[DownloadTrackingService, DomainError, DownloadProgressResponse] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.getDownloadProgress(sessionId))
+    
+  def cleanupDownloadSessions(): ZIO[DownloadTrackingService, Nothing, Unit] =
+    ZIO.serviceWithZIO[DownloadTrackingService](_.cleanupDownloadSessions())
+}

@@ -22,7 +22,8 @@ object Layers {
     FileManagementService & 
     SessionManagementService & 
     ValidationService &
-    TempFileManagementService
+    TempFileManagementService &
+    DownloadTrackingService
   ] = {
     import com.pdfwatermarks.config.TempFileConfig
     
@@ -41,13 +42,15 @@ object Layers {
     val sessionManagementLayer = ZLayer.succeed(SessionManagementServiceLive())
     val validationLayer = ZLayer.succeed(ValidationServiceLive())
     val tempFileManagementLayer = ZLayer.succeed(tempFileConfig) >>> TempFileManagementService.layer
+    val downloadTrackingLayer = ZLayer.succeed(DownloadTrackingServiceLive())
     
     pdfProcessingLayer ++
     watermarkRenderingLayer ++
     fileManagementLayer ++
     sessionManagementLayer ++
     validationLayer ++
-    tempFileManagementLayer
+    tempFileManagementLayer ++
+    downloadTrackingLayer
   }
 
   /**
@@ -59,7 +62,8 @@ object Layers {
     FileManagementService &
     SessionManagementService &
     ValidationService &
-    TempFileManagementService
+    TempFileManagementService &
+    DownloadTrackingService
   ] = {
     import com.pdfwatermarks.config.TempFileConfig
     
@@ -78,13 +82,15 @@ object Layers {
     val sessionManagementTestLayer = ZLayer.succeed(SessionManagementServiceTest())
     val validationTestLayer = ZLayer.succeed(ValidationServiceTest())
     val tempFileManagementTestLayer = ZLayer.succeed(tempFileConfig) >>> TempFileManagementService.layer
+    val downloadTrackingTestLayer = ZLayer.succeed(DownloadTrackingServiceTest())
     
     pdfProcessingTestLayer ++
     watermarkRenderingTestLayer ++
     fileManagementTestLayer ++
     sessionManagementTestLayer ++
     validationTestLayer ++
-    tempFileManagementTestLayer
+    tempFileManagementTestLayer ++
+    downloadTrackingTestLayer
   }
 
   // ========== Live Service Implementations ==========
@@ -293,6 +299,126 @@ object Layers {
     }
   }
 
+  /**
+   * Live implementation of download tracking service (Task 60).
+   */
+  case class DownloadTrackingServiceLive() extends DownloadTrackingService {
+    private val downloadSessions = scala.collection.concurrent.TrieMap[String, DownloadSession]()
+
+    override def createDownloadSession(
+      sessionId: String,
+      documentId: String,
+      filename: String,
+      fileSize: Long
+    ): UIO[DownloadSession] =
+      ZIO.succeed {
+        val downloadSession = DownloadSession(
+          sessionId = sessionId,
+          documentId = documentId,
+          filename = filename,
+          fileSize = fileSize,
+          bytesTransferred = 0L,
+          startedAt = java.time.Instant.now(),
+          lastActivity = java.time.Instant.now(),
+          status = DownloadStatus.Starting
+        )
+        downloadSessions.put(sessionId, downloadSession)
+        downloadSession
+      }
+
+    override def getDownloadSession(sessionId: String): IO[DomainError, DownloadSession] =
+      ZIO.fromOption(downloadSessions.get(sessionId))
+        .orElseFail(DomainError.SessionNotFound(s"Download session not found: $sessionId"))
+
+    override def updateDownloadProgress(
+      sessionId: String,
+      bytesTransferred: Long
+    ): IO[DomainError, DownloadSession] =
+      for {
+        session <- getDownloadSession(sessionId)
+        updated = session.copy(
+          bytesTransferred = bytesTransferred,
+          lastActivity = java.time.Instant.now(),
+          status = if (bytesTransferred >= session.fileSize) DownloadStatus.Completed else DownloadStatus.InProgress
+        )
+        _ <- ZIO.succeed(downloadSessions.put(sessionId, updated))
+      } yield updated
+
+    override def completeDownload(sessionId: String): IO[DomainError, DownloadSession] =
+      for {
+        session <- getDownloadSession(sessionId)
+        updated = session.copy(
+          bytesTransferred = session.fileSize,
+          lastActivity = java.time.Instant.now(),
+          status = DownloadStatus.Completed
+        )
+        _ <- ZIO.succeed(downloadSessions.put(sessionId, updated))
+      } yield updated
+
+    override def failDownload(sessionId: String, reason: String): IO[DomainError, DownloadSession] =
+      for {
+        session <- getDownloadSession(sessionId)
+        updated = session.copy(
+          lastActivity = java.time.Instant.now(),
+          status = DownloadStatus.Failed(reason)
+        )
+        _ <- ZIO.succeed(downloadSessions.put(sessionId, updated))
+      } yield updated
+
+    override def getDownloadProgress(sessionId: String): IO[DomainError, DownloadProgressResponse] =
+      for {
+        session <- getDownloadSession(sessionId)
+        progress = if (session.fileSize > 0) ((session.bytesTransferred * 100) / session.fileSize).toInt else 0
+        
+        // Calculate transfer rate and ETA
+        elapsedSeconds = java.time.Duration.between(session.startedAt, session.lastActivity).getSeconds
+        transferRate = if (elapsedSeconds > 0) Some(session.bytesTransferred / elapsedSeconds) else None
+        remainingBytes = session.fileSize - session.bytesTransferred
+        estimatedTimeRemaining = transferRate.filter(_ > 0).map(rate => remainingBytes / rate)
+        
+        statusText = session.status match {
+          case DownloadStatus.Starting => "starting"
+          case DownloadStatus.InProgress => "downloading"
+          case DownloadStatus.Completed => "completed"
+          case DownloadStatus.Failed(_) => "failed"
+          case DownloadStatus.Cancelled => "cancelled"
+        }
+        
+        message = session.status match {
+          case DownloadStatus.Starting => "Download is starting..."
+          case DownloadStatus.InProgress => s"Downloading... ${session.bytesTransferred}/${session.fileSize} bytes"
+          case DownloadStatus.Completed => "Download completed successfully"
+          case DownloadStatus.Failed(reason) => s"Download failed: $reason"
+          case DownloadStatus.Cancelled => "Download was cancelled"
+        }
+        
+      } yield DownloadProgressResponse(
+        sessionId = sessionId,
+        filename = session.filename,
+        fileSize = session.fileSize,
+        bytesTransferred = session.bytesTransferred,
+        progress = progress,
+        status = statusText,
+        transferRate = transferRate,
+        estimatedTimeRemaining = estimatedTimeRemaining,
+        message = message
+      )
+
+    override def cleanupDownloadSessions(): UIO[Unit] =
+      ZIO.succeed {
+        val now = java.time.Instant.now()
+        val expiredThreshold = now.minusSeconds(3600) // 1 hour
+        
+        downloadSessions.filterInPlace { (_, session) =>
+          session.status match {
+            case DownloadStatus.Completed | DownloadStatus.Failed(_) | DownloadStatus.Cancelled =>
+              session.lastActivity.isAfter(expiredThreshold)
+            case _ => true // Keep active downloads
+          }
+        }
+      }
+  }
+
   // ========== Test Service Implementations ==========
 
   /**
@@ -356,5 +482,48 @@ object Layers {
     override def validateWatermarkConfig(config: WatermarkConfig): IO[DomainError, Unit] = ZIO.unit
     override def validatePosition(position: Point, pageDimensions: PageDimensions): IO[DomainError, Unit] = ZIO.unit
     override def validateUpload(uploadInfo: UploadInfo): IO[DomainError, Unit] = ZIO.unit
+  }
+
+  case class DownloadTrackingServiceTest() extends DownloadTrackingService {
+    private val testDownloadSession = DownloadSession(
+      sessionId = "test-session-id",
+      documentId = "test-doc-id",
+      filename = "test.pdf",
+      fileSize = 1024L,
+      bytesTransferred = 512L,
+      startedAt = java.time.Instant.now(),
+      lastActivity = java.time.Instant.now(),
+      status = DownloadStatus.InProgress
+    )
+
+    override def createDownloadSession(sessionId: String, documentId: String, filename: String, fileSize: Long): UIO[DownloadSession] =
+      ZIO.succeed(testDownloadSession.copy(sessionId = sessionId, documentId = documentId, filename = filename, fileSize = fileSize))
+
+    override def getDownloadSession(sessionId: String): IO[DomainError, DownloadSession] =
+      ZIO.succeed(testDownloadSession.copy(sessionId = sessionId))
+
+    override def updateDownloadProgress(sessionId: String, bytesTransferred: Long): IO[DomainError, DownloadSession] =
+      ZIO.succeed(testDownloadSession.copy(sessionId = sessionId, bytesTransferred = bytesTransferred))
+
+    override def completeDownload(sessionId: String): IO[DomainError, DownloadSession] =
+      ZIO.succeed(testDownloadSession.copy(sessionId = sessionId, status = DownloadStatus.Completed, bytesTransferred = testDownloadSession.fileSize))
+
+    override def failDownload(sessionId: String, reason: String): IO[DomainError, DownloadSession] =
+      ZIO.succeed(testDownloadSession.copy(sessionId = sessionId, status = DownloadStatus.Failed(reason)))
+
+    override def getDownloadProgress(sessionId: String): IO[DomainError, DownloadProgressResponse] =
+      ZIO.succeed(DownloadProgressResponse(
+        sessionId = sessionId,
+        filename = "test.pdf",
+        fileSize = 1024L,
+        bytesTransferred = 512L,
+        progress = 50,
+        status = "downloading",
+        transferRate = Some(128L),
+        estimatedTimeRemaining = Some(4L),
+        message = "Test download in progress"
+      ))
+
+    override def cleanupDownloadSessions(): UIO[Unit] = ZIO.unit
   }
 }
