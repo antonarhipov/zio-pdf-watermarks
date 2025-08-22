@@ -55,6 +55,22 @@ class PDFWatermarkApp {
         // Navigation
         this.navLinks = document.querySelectorAll('.nav-link');
         this.sections = document.querySelectorAll('.section');
+        
+        // Watermark Configuration Form
+        this.watermarkForm = document.getElementById('watermark-config-form');
+        this.watermarkText = document.getElementById('watermark-text');
+        this.positionRadios = document.querySelectorAll('input[name="position"]');
+        this.positionCoordinates = document.getElementById('position-coordinates');
+        this.positionX = document.getElementById('position-x');
+        this.positionY = document.getElementById('position-y');
+        this.fontSizeSlider = document.getElementById('font-size');
+        this.fontSizeValue = document.getElementById('font-size-value');
+        this.colorPicker = document.getElementById('watermark-color');
+        this.colorPreview = document.getElementById('color-preview');
+        this.previewButton = document.getElementById('preview-watermark');
+        this.applyButton = document.getElementById('apply-watermark');
+        this.formErrors = document.getElementById('form-errors');
+        this.errorList = document.getElementById('error-list');
     }
     
     /**
@@ -83,6 +99,11 @@ class PDFWatermarkApp {
         // Prevent default drag behaviors
         document.addEventListener('dragover', (e) => e.preventDefault());
         document.addEventListener('drop', (e) => e.preventDefault());
+        
+        // Watermark Configuration Form Events
+        if (this.watermarkForm) {
+            this.bindWatermarkFormEvents();
+        }
     }
     
     /**
@@ -475,6 +496,291 @@ class PDFWatermarkApp {
                 this.fileInput.click();
             }
         });
+    }
+    
+    /**
+     * Bind watermark configuration form events (Tasks 47-51)
+     */
+    bindWatermarkFormEvents() {
+        // Position radio button events
+        this.positionRadios.forEach(radio => {
+            radio.addEventListener('change', () => this.handlePositionChange());
+        });
+        
+        // Font size slider events
+        this.fontSizeSlider.addEventListener('input', () => this.handleFontSizeChange());
+        
+        // Color picker events
+        this.colorPicker.addEventListener('change', () => this.handleColorChange());
+        
+        // Form validation on input
+        this.watermarkText.addEventListener('input', () => this.validateField('text'));
+        this.positionX.addEventListener('input', () => this.validateField('position'));
+        this.positionY.addEventListener('input', () => this.validateField('position'));
+        
+        // Form submission
+        this.watermarkForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        
+        // Preview button
+        this.previewButton.addEventListener('click', () => this.handlePreview());
+        
+        // Initialize default values
+        this.handlePositionChange();
+        this.handleFontSizeChange();
+        this.handleColorChange();
+    }
+    
+    /**
+     * Handle position selection change (Task 48)
+     */
+    handlePositionChange() {
+        const selectedPosition = document.querySelector('input[name="position"]:checked').value;
+        
+        if (selectedPosition === 'fixed') {
+            this.positionCoordinates.style.display = 'block';
+            this.positionX.required = true;
+            this.positionY.required = true;
+        } else {
+            this.positionCoordinates.style.display = 'none';
+            this.positionX.required = false;
+            this.positionY.required = false;
+            this.positionX.value = '';
+            this.positionY.value = '';
+        }
+        
+        this.clearFieldError('position');
+    }
+    
+    /**
+     * Handle font size slider change (Task 49)
+     */
+    handleFontSizeChange() {
+        const fontSize = this.fontSizeSlider.value;
+        this.fontSizeValue.textContent = `${fontSize}px`;
+        this.clearFieldError('fontSize');
+    }
+    
+    /**
+     * Handle color picker change (Task 50)
+     */
+    handleColorChange() {
+        const color = this.colorPicker.value;
+        this.colorPreview.textContent = color.toUpperCase();
+        this.clearFieldError('color');
+    }
+    
+    /**
+     * Validate individual form field (Task 51)
+     */
+    validateField(fieldName) {
+        let isValid = true;
+        let errorMessage = '';
+        
+        switch (fieldName) {
+            case 'text':
+                const text = this.watermarkText.value.trim();
+                if (!text) {
+                    errorMessage = 'Watermark text is required';
+                    isValid = false;
+                } else if (text.length > 100) {
+                    errorMessage = 'Watermark text must be less than 100 characters';
+                    isValid = false;
+                }
+                break;
+                
+            case 'position':
+                const selectedPosition = document.querySelector('input[name="position"]:checked').value;
+                if (selectedPosition === 'fixed') {
+                    const x = parseFloat(this.positionX.value);
+                    const y = parseFloat(this.positionY.value);
+                    
+                    if (isNaN(x) || x < 0) {
+                        errorMessage = 'X position must be a positive number';
+                        isValid = false;
+                    } else if (isNaN(y) || y < 0) {
+                        errorMessage = 'Y position must be a positive number';
+                        isValid = false;
+                    }
+                }
+                break;
+                
+            case 'fontSize':
+                const fontSize = parseInt(this.fontSizeSlider.value);
+                if (fontSize < 8 || fontSize > 72) {
+                    errorMessage = 'Font size must be between 8 and 72 pixels';
+                    isValid = false;
+                }
+                break;
+                
+            case 'color':
+                const color = this.colorPicker.value;
+                if (!color || !color.match(/^#[0-9A-Fa-f]{6}$/)) {
+                    errorMessage = 'Please select a valid color';
+                    isValid = false;
+                }
+                break;
+        }
+        
+        if (!isValid) {
+            this.showFieldError(fieldName, errorMessage);
+        } else {
+            this.clearFieldError(fieldName);
+        }
+        
+        return isValid;
+    }
+    
+    /**
+     * Validate entire form (Task 51)
+     */
+    validateForm() {
+        const fields = ['text', 'position', 'fontSize', 'color'];
+        let allValid = true;
+        const errors = [];
+        
+        fields.forEach(field => {
+            if (!this.validateField(field)) {
+                allValid = false;
+            }
+        });
+        
+        // Additional form-level validations
+        if (!this.currentSessionId) {
+            errors.push('Please upload a PDF file first');
+            allValid = false;
+        }
+        
+        if (!allValid) {
+            this.showFormErrors(errors);
+        } else {
+            this.hideFormErrors();
+        }
+        
+        return allValid;
+    }
+    
+    /**
+     * Show field error (Task 51)
+     */
+    showFieldError(fieldName, message) {
+        const errorElement = document.getElementById(`${fieldName}-error`);
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+    }
+    
+    /**
+     * Clear field error (Task 51)
+     */
+    clearFieldError(fieldName) {
+        const errorElement = document.getElementById(`${fieldName}-error`);
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+        }
+    }
+    
+    /**
+     * Show form errors (Task 51)
+     */
+    showFormErrors(errors) {
+        if (errors.length === 0) return;
+        
+        this.errorList.innerHTML = '';
+        errors.forEach(error => {
+            const li = document.createElement('li');
+            li.textContent = error;
+            this.errorList.appendChild(li);
+        });
+        
+        this.formErrors.style.display = 'block';
+    }
+    
+    /**
+     * Hide form errors (Task 51)
+     */
+    hideFormErrors() {
+        this.formErrors.style.display = 'none';
+    }
+    
+    /**
+     * Get watermark configuration from form
+     */
+    getWatermarkConfig() {
+        const selectedPosition = document.querySelector('input[name="position"]:checked').value;
+        const positionConfig = selectedPosition === 'random' 
+            ? { type: 'random' }
+            : { 
+                type: 'fixed', 
+                x: parseFloat(this.positionX.value), 
+                y: parseFloat(this.positionY.value) 
+              };
+        
+        return {
+            text: this.watermarkText.value.trim(),
+            position: positionConfig,
+            orientation: { type: 'fixed', angle: 0 }, // Default for basic implementation
+            fontSize: { type: 'fixed', size: parseInt(this.fontSizeSlider.value) },
+            color: { type: 'fixed', color: this.colorPicker.value },
+            quantity: 1 // Default for basic implementation
+        };
+    }
+    
+    /**
+     * Handle form preview (Tasks 47-51)
+     */
+    async handlePreview() {
+        if (!this.validateForm()) return;
+        
+        const config = this.getWatermarkConfig();
+        console.log('Preview watermark config:', config);
+        
+        // For now, show a notification - preview functionality can be enhanced later
+        this.showNotification('Preview functionality will be available in a future update', 'info');
+    }
+    
+    /**
+     * Handle form submission (Tasks 47-51)
+     */
+    async handleFormSubmit(e) {
+        e.preventDefault();
+        
+        if (!this.validateForm()) return;
+        
+        try {
+            this.showLoading('Applying watermark...');
+            
+            const config = this.getWatermarkConfig();
+            console.log('Applying watermark config:', config);
+            
+            const response = await fetch('/api/watermark/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId: this.currentSessionId,
+                    config: config
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                this.hideLoading();
+                this.navigateToSection('download');
+                this.showNotification('Watermark applied successfully!', 'success');
+            } else {
+                this.hideLoading();
+                this.showNotification(result.message || 'Failed to apply watermark', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Watermark application error:', error);
+            this.hideLoading();
+            this.showNotification('Failed to apply watermark. Please try again.', 'error');
+        }
     }
     
     /**
