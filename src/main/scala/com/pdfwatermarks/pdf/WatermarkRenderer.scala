@@ -47,12 +47,12 @@ object WatermarkRenderer {
               page.getMediaBox.getHeight.toDouble
             )
             
-            // Generate watermark instances for this page
-            val watermarkInstances = generateWatermarkInstances(pageDimensions, config)
+            // Generate watermark instances for this page with their seeds
+            val watermarkInstancesWithSeeds = generateWatermarkInstancesWithSeeds(pageDimensions, config)
             
             // Apply each watermark instance to the page
-            watermarkInstances.foreach { instance =>
-              applyWatermarkToPage(document, page, instance)
+            watermarkInstancesWithSeeds.foreach { case (instance, seed) =>
+              applyWatermarkToPageWithConfig(document, page, instance, config.color, seed)
             }
           }
           
@@ -69,13 +69,21 @@ object WatermarkRenderer {
     }
 
   /**
-   * Apply a single watermark instance to a PDF page.
+   * Apply a single watermark instance to a PDF page with color configuration support.
    * 
    * @param document The PDF document
    * @param page The page to add the watermark to
    * @param watermark The watermark instance to apply
+   * @param colorConfig The color configuration for advanced coloring options
+   * @param watermarkSeed The seed for this specific watermark's randomization
    */
-  private def applyWatermarkToPage(document: PDDocument, page: PDPage, watermark: WatermarkInstance): Unit = {
+  private def applyWatermarkToPageWithConfig(
+    document: PDDocument, 
+    page: PDPage, 
+    watermark: WatermarkInstance, 
+    colorConfig: ColorConfig,
+    watermarkSeed: Long = 0L
+  ): Unit = {
     val contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)
     
     try {
@@ -84,29 +92,16 @@ object WatermarkRenderer {
       graphicsState.setNonStrokingAlphaConstant(0.5f) // Semi-transparent
       contentStream.setGraphicsStateParameters(graphicsState)
       
-      // Set text color
-      contentStream.setNonStrokingColor(watermark.color)
-      
-      // Begin text rendering
-      contentStream.beginText()
-      
-      // Set font and size
+      // Set font
       val font = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
       contentStream.setFont(font, watermark.fontSize.toFloat)
       
-      // Calculate text transformation matrix for positioning and rotation
-      val transform = Matrix.getTranslateInstance(watermark.position.x.toFloat, watermark.position.y.toFloat)
-      if (watermark.angle != 0.0) {
-        val rotation = Matrix.getRotateInstance(Math.toRadians(watermark.angle), 0, 0)
-        transform.concatenate(rotation)
+      colorConfig match {
+        case ColorConfig.RandomPerLetter =>
+          renderTextWithPerLetterColors(contentStream, watermark, font, watermarkSeed)
+        case _ =>
+          renderTextWithSingleColor(contentStream, watermark, font)
       }
-      
-      contentStream.setTextMatrix(transform)
-      
-      // Draw the text
-      contentStream.showText(watermark.text)
-      
-      contentStream.endText()
       
     } finally {
       contentStream.close()
@@ -114,21 +109,117 @@ object WatermarkRenderer {
   }
 
   /**
-   * Generate watermark instances based on configuration.
+   * Render text with per-letter random colors using watermark-specific seed.
+   */
+  private def renderTextWithPerLetterColors(
+    contentStream: PDPageContentStream,
+    watermark: WatermarkInstance,
+    font: PDFont,
+    watermarkSeed: Long
+  ): Unit = {
+    val random = new Random(watermarkSeed + 5000) // Add offset for per-letter color randomization
+    val chars = watermark.text.toCharArray
+    var currentX = 0.0f
+    
+    // Calculate base transformation matrix
+    val baseTransform = Matrix.getTranslateInstance(watermark.position.x.toFloat, watermark.position.y.toFloat)
+    if (watermark.angle != 0.0) {
+      val rotation = Matrix.getRotateInstance(Math.toRadians(watermark.angle), 0, 0)
+      baseTransform.concatenate(rotation)
+    }
+    
+    // Render each character individually
+    chars.foreach { char =>
+      // Generate random color for this character
+      val charColor = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
+      
+      // Set color and begin text
+      contentStream.setNonStrokingColor(charColor)
+      contentStream.beginText()
+      
+      // Calculate character position
+      val charTransform = baseTransform.clone()
+      charTransform.concatenate(Matrix.getTranslateInstance(currentX, 0))
+      contentStream.setTextMatrix(charTransform)
+      
+      // Draw the character
+      contentStream.showText(char.toString)
+      contentStream.endText()
+      
+      // Calculate character width for next position
+      val charWidth = try {
+        font.getStringWidth(char.toString) / 1000.0f * watermark.fontSize.toFloat
+      } catch {
+        case _: Exception => watermark.fontSize.toFloat * 0.6f // fallback estimate
+      }
+      currentX += charWidth
+    }
+  }
+
+  /**
+   * Render text with single color (legacy behavior).
+   */
+  private def renderTextWithSingleColor(
+    contentStream: PDPageContentStream,
+    watermark: WatermarkInstance,
+    font: PDFont
+  ): Unit = {
+    // Set text color
+    contentStream.setNonStrokingColor(watermark.color)
+    
+    // Begin text rendering
+    contentStream.beginText()
+    
+    // Calculate text transformation matrix for positioning and rotation
+    val transform = Matrix.getTranslateInstance(watermark.position.x.toFloat, watermark.position.y.toFloat)
+    if (watermark.angle != 0.0) {
+      val rotation = Matrix.getRotateInstance(Math.toRadians(watermark.angle), 0, 0)
+      transform.concatenate(rotation)
+    }
+    
+    contentStream.setTextMatrix(transform)
+    
+    // Draw the text
+    contentStream.showText(watermark.text)
+    
+    contentStream.endText()
+  }
+
+  /**
+   * Apply a single watermark instance to a PDF page (legacy method for compatibility).
+   * 
+   * @param document The PDF document
+   * @param page The page to add the watermark to
+   * @param watermark The watermark instance to apply
+   */
+  private def applyWatermarkToPage(document: PDDocument, page: PDPage, watermark: WatermarkInstance): Unit = {
+    // Generate a seed for this watermark instance for backward compatibility
+    val legacySeed = new Random().nextLong()
+    applyWatermarkToPageWithConfig(document, page, watermark, ColorConfig.Fixed(watermark.color), legacySeed)
+  }
+
+  /**
+   * Generate watermark instances with their seeds for independent randomization.
    * 
    * @param pageDimensions The dimensions of the page
    * @param config The watermark configuration
-   * @return List of watermark instances
+   * @return List of (watermark instance, seed) pairs
    */
-  def generateWatermarkInstances(pageDimensions: PageDimensions, config: WatermarkConfig): List[WatermarkInstance] = {
+  def generateWatermarkInstancesWithSeeds(pageDimensions: PageDimensions, config: WatermarkConfig): List[(WatermarkInstance, Long)] = {
+    // Create a base random generator to ensure independent seeds for each watermark
+    val baseRandom = new Random()
+    
     (1 to config.quantity).map { index =>
-      val position = generatePosition(pageDimensions, config.position, index)
-      val angle = generateAngle(config.orientation, index)
-      val fontSize = generateFontSize(config.fontSize, index)
-      val color = generateColor(config.color, config.text, index)
+      // Generate a unique seed for this specific watermark instance
+      val watermarkSeed = baseRandom.nextLong()
+      
+      val position = generatePosition(pageDimensions, config.position, watermarkSeed, index)
+      val angle = generateAngle(config.orientation, watermarkSeed, index)
+      val fontSize = generateFontSize(config.fontSize, watermarkSeed, index)
+      val color = generateColor(config.color, config.text, watermarkSeed, index)
       val boundingBox = calculateBoundingBox(position, config.text, fontSize, angle, pageDimensions)
       
-      WatermarkInstance(
+      val instance = WatermarkInstance(
         text = config.text,
         position = position,
         angle = angle,
@@ -136,17 +227,30 @@ object WatermarkRenderer {
         color = color,
         boundingBox = boundingBox
       )
+      
+      (instance, watermarkSeed)
     }.toList
   }
 
   /**
-   * Generate position based on configuration.
+   * Generate watermark instances based on configuration (backward compatibility).
+   * 
+   * @param pageDimensions The dimensions of the page
+   * @param config The watermark configuration
+   * @return List of watermark instances
    */
-  private def generatePosition(pageDimensions: PageDimensions, positionConfig: PositionConfig, index: Int): Point = {
+  def generateWatermarkInstances(pageDimensions: PageDimensions, config: WatermarkConfig): List[WatermarkInstance] = {
+    generateWatermarkInstancesWithSeeds(pageDimensions, config).map(_._1)
+  }
+
+  /**
+   * Generate position based on configuration using watermark-specific seed.
+   */
+  private def generatePosition(pageDimensions: PageDimensions, positionConfig: PositionConfig, watermarkSeed: Long, index: Int): Point = {
     positionConfig match {
       case PositionConfig.Fixed(x, y) => Point(x, y)
       case PositionConfig.Random =>
-        val random = new Random(java.lang.System.currentTimeMillis() + index)
+        val random = new Random(watermarkSeed + 1000) // Add offset for position randomization
         val margin = 50.0 // Margin from edges
         Point(
           x = margin + random.nextDouble() * (pageDimensions.width - 2 * margin),
@@ -160,13 +264,13 @@ object WatermarkRenderer {
   }
 
   /**
-   * Generate angle based on configuration.
+   * Generate angle based on configuration using watermark-specific seed.
    */
-  private def generateAngle(orientationConfig: OrientationConfig, index: Int): Double = {
+  private def generateAngle(orientationConfig: OrientationConfig, watermarkSeed: Long, index: Int): Double = {
     orientationConfig match {
       case OrientationConfig.Fixed(angle) => angle
       case OrientationConfig.Random =>
-        val random = new Random(java.lang.System.currentTimeMillis() + index + 1000)
+        val random = new Random(watermarkSeed + 2000) // Add offset for orientation randomization
         random.nextDouble() * 360.0
       case OrientationConfig.Preset(preset) =>
         preset match {
@@ -183,13 +287,13 @@ object WatermarkRenderer {
   }
 
   /**
-   * Generate font size based on configuration.
+   * Generate font size based on configuration using watermark-specific seed.
    */
-  private def generateFontSize(fontSizeConfig: FontSizeConfig, index: Int): Double = {
+  private def generateFontSize(fontSizeConfig: FontSizeConfig, watermarkSeed: Long, index: Int): Double = {
     fontSizeConfig match {
       case FontSizeConfig.Fixed(size) => size
       case FontSizeConfig.Random(min, max) =>
-        val random = new Random(java.lang.System.currentTimeMillis() + index + 2000)
+        val random = new Random(watermarkSeed + 3000) // Add offset for font size randomization
         min + random.nextDouble() * (max - min)
       case FontSizeConfig.DynamicScale(baseSize, scaleFactor) =>
         // For this legacy renderer, use base size directly
@@ -210,15 +314,14 @@ object WatermarkRenderer {
   }
 
   /**
-   * Generate color based on configuration.
+   * Generate color based on configuration using watermark-specific seed.
    */
-  private def generateColor(colorConfig: ColorConfig, text: String, index: Int): Color = {
+  private def generateColor(colorConfig: ColorConfig, text: String, watermarkSeed: Long, index: Int): Color = {
     colorConfig match {
       case ColorConfig.Fixed(color) => color
       case ColorConfig.RandomPerLetter =>
-        // For now, return a single random color per watermark
-        // Individual letter coloring will be implemented in Phase 3
-        val random = new Random(java.lang.System.currentTimeMillis() + index + 3000)
+        // Return a single random color per watermark - individual letter coloring happens in rendering
+        val random = new Random(watermarkSeed + 4000) // Add offset for color randomization
         new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
       case ColorConfig.Palette(palette) =>
         // For this legacy renderer, use a simple palette selection

@@ -173,6 +173,9 @@ object HttpServer {
           for {
             size <- ZIO.fromOption(frontendConfig.fontSize.size).orElseFail(DomainError.InvalidConfiguration(List("Missing size for fixed font size")))
           } yield FontSizeConfig.Fixed(size)
+        case "random" =>
+          // For random font size, use default range if no specific values provided
+          ZIO.succeed(FontSizeConfig.Random(12.0, 48.0))
         case other => 
           ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid font size type: $other")))
       }
@@ -183,6 +186,8 @@ object HttpServer {
             colorValue <- ZIO.fromOption(frontendConfig.color.color).orElseFail(DomainError.InvalidConfiguration(List("Missing color value for fixed color")))
             javaColor <- convertHexToColor(colorValue)
           } yield ColorConfig.Fixed(javaColor)
+        case "randomPerLetter" =>
+          ZIO.succeed(ColorConfig.RandomPerLetter)
         case other => 
           ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid color type: $other")))
       }

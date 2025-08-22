@@ -63,10 +63,31 @@ class PDFWatermarkApp {
         this.positionCoordinates = document.getElementById('position-coordinates');
         this.positionX = document.getElementById('position-x');
         this.positionY = document.getElementById('position-y');
+        
+        // Font Size Configuration
+        this.fontSizeTypeRadios = document.querySelectorAll('input[name="fontSizeType"]');
+        this.fixedFontSizeControl = document.getElementById('fixed-font-size-control');
+        this.randomFontSizeControl = document.getElementById('random-font-size-control');
         this.fontSizeSlider = document.getElementById('font-size');
         this.fontSizeValue = document.getElementById('font-size-value');
+        this.fontSizeMin = document.getElementById('font-size-min');
+        this.fontSizeMax = document.getElementById('font-size-max');
+        
+        // Color Configuration
+        this.colorTypeRadios = document.querySelectorAll('input[name="colorType"]');
+        this.fixedColorPicker = document.getElementById('fixed-color-picker');
         this.colorPicker = document.getElementById('watermark-color');
         this.colorPreview = document.getElementById('color-preview');
+        
+        // Orientation Configuration
+        this.orientationTypeRadios = document.querySelectorAll('input[name="orientationType"]');
+        this.fixedOrientationControl = document.getElementById('fixed-orientation-control');
+        this.orientationSlider = document.getElementById('orientation-angle');
+        this.orientationValue = document.getElementById('orientation-value');
+        
+        // Quantity Configuration
+        this.quantityInput = document.getElementById('watermark-quantity');
+        
         this.previewButton = document.getElementById('preview-watermark');
         this.applyButton = document.getElementById('apply-watermark');
         this.formErrors = document.getElementById('form-errors');
@@ -522,11 +543,28 @@ class PDFWatermarkApp {
             radio.addEventListener('change', () => this.handlePositionChange());
         });
         
-        // Font size slider events
+        // Font size configuration events
+        this.fontSizeTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => this.handleFontSizeTypeChange());
+        });
         this.fontSizeSlider.addEventListener('input', () => this.handleFontSizeChange());
+        this.fontSizeMin.addEventListener('input', () => this.handleFontSizeRangeChange());
+        this.fontSizeMax.addEventListener('input', () => this.handleFontSizeRangeChange());
         
-        // Color picker events
+        // Color configuration events
+        this.colorTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => this.handleColorTypeChange());
+        });
         this.colorPicker.addEventListener('change', () => this.handleColorChange());
+        
+        // Orientation configuration events
+        this.orientationTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => this.handleOrientationTypeChange());
+        });
+        this.orientationSlider.addEventListener('input', () => this.handleOrientationChange());
+        
+        // Quantity events
+        this.quantityInput.addEventListener('input', () => this.handleQuantityChange());
         
         // Form validation on input
         this.watermarkText.addEventListener('input', () => this.validateField('text'));
@@ -547,8 +585,13 @@ class PDFWatermarkApp {
         
         // Initialize default values
         this.handlePositionChange();
+        this.handleFontSizeTypeChange();
         this.handleFontSizeChange();
+        this.handleColorTypeChange();
         this.handleColorChange();
+        this.handleOrientationTypeChange();
+        this.handleOrientationChange();
+        this.handleQuantityChange();
     }
     
     /**
@@ -573,6 +616,27 @@ class PDFWatermarkApp {
     }
     
     /**
+     * Handle font size type selection change
+     */
+    handleFontSizeTypeChange() {
+        const selectedType = document.querySelector('input[name="fontSizeType"]:checked').value;
+        
+        if (selectedType === 'fixed') {
+            this.fixedFontSizeControl.style.display = 'block';
+            this.randomFontSizeControl.style.display = 'none';
+            this.fontSizeMin.required = false;
+            this.fontSizeMax.required = false;
+        } else {
+            this.fixedFontSizeControl.style.display = 'none';
+            this.randomFontSizeControl.style.display = 'block';
+            this.fontSizeMin.required = true;
+            this.fontSizeMax.required = true;
+        }
+        
+        this.clearFieldError('fontSize');
+    }
+
+    /**
      * Handle font size slider change (Task 49)
      */
     handleFontSizeChange() {
@@ -580,7 +644,39 @@ class PDFWatermarkApp {
         this.fontSizeValue.textContent = `${fontSize}px`;
         this.clearFieldError('fontSize');
     }
+
+    /**
+     * Handle font size range inputs change
+     */
+    handleFontSizeRangeChange() {
+        const min = parseInt(this.fontSizeMin.value);
+        const max = parseInt(this.fontSizeMax.value);
+        
+        // Ensure max is greater than min
+        if (min >= max) {
+            this.fontSizeMax.value = min + 1;
+        }
+        
+        this.clearFieldError('fontSize');
+    }
     
+    /**
+     * Handle color type selection change
+     */
+    handleColorTypeChange() {
+        const selectedType = document.querySelector('input[name="colorType"]:checked').value;
+        
+        if (selectedType === 'fixed') {
+            this.fixedColorPicker.style.display = 'block';
+            this.colorPicker.required = true;
+        } else {
+            this.fixedColorPicker.style.display = 'none';
+            this.colorPicker.required = false;
+        }
+        
+        this.clearFieldError('color');
+    }
+
     /**
      * Handle color picker change (Task 50)
      */
@@ -588,6 +684,48 @@ class PDFWatermarkApp {
         const color = this.colorPicker.value;
         this.colorPreview.textContent = color.toUpperCase();
         this.clearFieldError('color');
+    }
+
+    /**
+     * Handle orientation type selection change
+     */
+    handleOrientationTypeChange() {
+        const selectedType = document.querySelector('input[name="orientationType"]:checked').value;
+        
+        if (selectedType === 'fixed') {
+            this.fixedOrientationControl.style.display = 'block';
+            this.orientationSlider.required = true;
+        } else {
+            this.fixedOrientationControl.style.display = 'none';
+            this.orientationSlider.required = false;
+        }
+        
+        this.clearFieldError('orientation');
+    }
+
+    /**
+     * Handle orientation slider change
+     */
+    handleOrientationChange() {
+        const angle = this.orientationSlider.value;
+        this.orientationValue.textContent = `${angle}°`;
+        this.clearFieldError('orientation');
+    }
+
+    /**
+     * Handle quantity input change
+     */
+    handleQuantityChange() {
+        const quantity = parseInt(this.quantityInput.value);
+        
+        // Ensure quantity is within valid range
+        if (quantity < 1) {
+            this.quantityInput.value = 1;
+        } else if (quantity > 20) {
+            this.quantityInput.value = 20;
+        }
+        
+        this.clearFieldError('quantity');
     }
     
     /**
@@ -626,17 +764,57 @@ class PDFWatermarkApp {
                 break;
                 
             case 'fontSize':
-                const fontSize = parseInt(this.fontSizeSlider.value);
-                if (fontSize < 8 || fontSize > 72) {
-                    errorMessage = 'Font size must be between 8 and 72 pixels';
-                    isValid = false;
+                const fontSizeType = document.querySelector('input[name="fontSizeType"]:checked').value;
+                if (fontSizeType === 'fixed') {
+                    const fontSize = parseInt(this.fontSizeSlider.value);
+                    if (fontSize < 8 || fontSize > 72) {
+                        errorMessage = 'Font size must be between 8 and 72 pixels';
+                        isValid = false;
+                    }
+                } else {
+                    const minSize = parseInt(this.fontSizeMin.value);
+                    const maxSize = parseInt(this.fontSizeMax.value);
+                    if (isNaN(minSize) || minSize < 8 || minSize > 72) {
+                        errorMessage = 'Minimum font size must be between 8 and 72 pixels';
+                        isValid = false;
+                    } else if (isNaN(maxSize) || maxSize < 8 || maxSize > 72) {
+                        errorMessage = 'Maximum font size must be between 8 and 72 pixels';
+                        isValid = false;
+                    } else if (minSize >= maxSize) {
+                        errorMessage = 'Maximum font size must be greater than minimum';
+                        isValid = false;
+                    }
                 }
                 break;
                 
             case 'color':
-                const color = this.colorPicker.value;
-                if (!color || !color.match(/^#[0-9A-Fa-f]{6}$/)) {
-                    errorMessage = 'Please select a valid color';
+                const colorType = document.querySelector('input[name="colorType"]:checked').value;
+                if (colorType === 'fixed') {
+                    const color = this.colorPicker.value;
+                    if (!color || !color.match(/^#[0-9A-Fa-f]{6}$/)) {
+                        errorMessage = 'Please select a valid color';
+                        isValid = false;
+                    }
+                }
+                // RandomPerLetter doesn't need additional validation
+                break;
+                
+            case 'orientation':
+                const orientationType = document.querySelector('input[name="orientationType"]:checked').value;
+                if (orientationType === 'fixed') {
+                    const angle = parseInt(this.orientationSlider.value);
+                    if (isNaN(angle) || angle < 0 || angle > 360) {
+                        errorMessage = 'Orientation angle must be between 0 and 360 degrees';
+                        isValid = false;
+                    }
+                }
+                // Random orientation doesn't need additional validation
+                break;
+                
+            case 'quantity':
+                const quantity = parseInt(this.quantityInput.value);
+                if (isNaN(quantity) || quantity < 1 || quantity > 20) {
+                    errorMessage = 'Number of watermarks must be between 1 and 20';
                     isValid = false;
                 }
                 break;
@@ -655,7 +833,7 @@ class PDFWatermarkApp {
      * Validate entire form (Task 51)
      */
     validateForm() {
-        const fields = ['text', 'position', 'fontSize', 'color'];
+        const fields = ['text', 'position', 'fontSize', 'color', 'orientation', 'quantity'];
         let allValid = true;
         const errors = [];
         
@@ -729,6 +907,7 @@ class PDFWatermarkApp {
      * Get watermark configuration from form
      */
     getWatermarkConfig() {
+        // Position configuration
         const selectedPosition = document.querySelector('input[name="position"]:checked').value;
         const positionConfig = selectedPosition === 'random' 
             ? { type: 'random' }
@@ -738,13 +917,34 @@ class PDFWatermarkApp {
                 y: parseFloat(this.positionY.value) 
               };
         
+        // Font size configuration
+        const selectedFontSizeType = document.querySelector('input[name="fontSizeType"]:checked').value;
+        const fontSizeConfig = selectedFontSizeType === 'fixed'
+            ? { type: 'fixed', size: parseInt(this.fontSizeSlider.value) }
+            : { type: 'random', min: parseInt(this.fontSizeMin.value), max: parseInt(this.fontSizeMax.value) };
+        
+        // Color configuration
+        const selectedColorType = document.querySelector('input[name="colorType"]:checked').value;
+        const colorConfig = selectedColorType === 'fixed'
+            ? { type: 'fixed', color: this.colorPicker.value }
+            : { type: 'randomPerLetter' };
+        
+        // Orientation configuration
+        const selectedOrientationType = document.querySelector('input[name="orientationType"]:checked').value;
+        const orientationConfig = selectedOrientationType === 'fixed'
+            ? { type: 'fixed', angle: parseInt(this.orientationSlider.value) }
+            : { type: 'random' };
+        
+        // Quantity
+        const quantity = parseInt(this.quantityInput.value);
+        
         return {
             text: this.watermarkText.value.trim(),
             position: positionConfig,
-            orientation: { type: 'fixed', angle: 0 }, // Default for basic implementation
-            fontSize: { type: 'fixed', size: parseInt(this.fontSizeSlider.value) },
-            color: { type: 'fixed', color: this.colorPicker.value },
-            quantity: 1 // Default for basic implementation
+            orientation: orientationConfig,
+            fontSize: fontSizeConfig,
+            color: colorConfig,
+            quantity: quantity
         };
     }
     

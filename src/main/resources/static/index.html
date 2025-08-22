@@ -186,8 +186,18 @@
                             
                             <!-- Font Size Configuration -->
                             <div class="form-group">
-                                <label for="font-size" class="form-label">Font Size</label>
-                                <div class="font-size-control">
+                                <label class="form-label">Font Size Configuration</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="font-size-fixed" name="fontSizeType" value="fixed" checked>
+                                        <label for="font-size-fixed">Fixed Size</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="font-size-random" name="fontSizeType" value="random">
+                                        <label for="font-size-random">Random Range</label>
+                                    </div>
+                                </div>
+                                <div id="fixed-font-size-control" class="font-size-control">
                                     <input 
                                         type="range" 
                                         id="font-size" 
@@ -200,13 +210,37 @@
                                     >
                                     <span class="font-size-value" id="font-size-value">16px</span>
                                 </div>
+                                <div id="random-font-size-control" class="font-size-range-control" style="display: none;">
+                                    <div class="range-input-group">
+                                        <div class="range-input">
+                                            <label for="font-size-min" class="range-label">Min Size</label>
+                                            <input type="number" id="font-size-min" name="fontSizeMin" class="form-input" min="8" max="72" value="12" step="1">
+                                            <span class="range-unit">px</span>
+                                        </div>
+                                        <div class="range-input">
+                                            <label for="font-size-max" class="range-label">Max Size</label>
+                                            <input type="number" id="font-size-max" name="fontSizeMax" class="form-input" min="8" max="72" value="48" step="1">
+                                            <span class="range-unit">px</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-error" id="fontSize-error"></div>
                             </div>
                             
                             <!-- Color Configuration -->
                             <div class="form-group">
-                                <label for="watermark-color" class="form-label">Text Color</label>
-                                <div class="color-picker-container">
+                                <label class="form-label">Color Configuration</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="color-fixed" name="colorType" value="fixed" checked>
+                                        <label for="color-fixed">Fixed Color</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="color-random-per-letter" name="colorType" value="randomPerLetter">
+                                        <label for="color-random-per-letter">Random Color Per Letter</label>
+                                    </div>
+                                </div>
+                                <div id="fixed-color-picker" class="color-picker-container">
                                     <input 
                                         type="color" 
                                         id="watermark-color" 
@@ -218,7 +252,55 @@
                                 </div>
                                 <div class="form-error" id="color-error"></div>
                             </div>
-                            
+            
+                            <!-- Orientation Configuration -->
+                            <div class="form-group">
+                                <label class="form-label">Orientation Configuration</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="orientation-fixed" name="orientationType" value="fixed" checked>
+                                        <label for="orientation-fixed">Fixed Angle</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="orientation-random" name="orientationType" value="random">
+                                        <label for="orientation-random">Random Rotation</label>
+                                    </div>
+                                </div>
+                                <div id="fixed-orientation-control" class="orientation-control">
+                                    <input 
+                                        type="range" 
+                                        id="orientation-angle" 
+                                        name="orientationAngle"
+                                        class="orientation-slider" 
+                                        min="0" 
+                                        max="360" 
+                                        value="0"
+                                        step="1"
+                                    >
+                                    <span class="orientation-value" id="orientation-value">0°</span>
+                                </div>
+                                <div class="form-error" id="orientation-error"></div>
+                            </div>
+            
+                            <!-- Quantity Configuration -->
+                            <div class="form-group">
+                                <label for="watermark-quantity" class="form-label">Number of Watermarks</label>
+                                <div class="quantity-control">
+                                    <input 
+                                        type="number" 
+                                        id="watermark-quantity" 
+                                        name="quantity"
+                                        class="form-input quantity-input" 
+                                        min="1" 
+                                        max="20" 
+                                        value="1"
+                                        step="1"
+                                    >
+                                    <span class="quantity-hint">Maximum 20 watermarks per document</span>
+                                </div>
+                                <div class="form-error" id="quantity-error"></div>
+                            </div>
+            
                             <!-- Form Actions -->
                             <div class="form-actions">
                                 <button type="button" class="button button-secondary" id="preview-watermark">

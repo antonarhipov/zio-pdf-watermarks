@@ -610,6 +610,122 @@ body {
     font-size: 0.875rem;
 }
 
+/* Font Size Range Control */
+.font-size-range-control {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.range-input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.range-input {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.range-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.range-unit {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.875rem;
+    color: #6b7280;
+    pointer-events: none;
+}
+
+/* Orientation Control */
+.orientation-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.orientation-slider {
+    flex: 1;
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    background: #e5e7eb;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.orientation-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.orientation-slider::-webkit-slider-thumb:hover {
+    background: #5a67d8;
+    transform: scale(1.1);
+}
+
+.orientation-slider::-moz-range-thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.orientation-slider::-moz-range-thumb:hover {
+    background: #5a67d8;
+    transform: scale(1.1);
+}
+
+.orientation-value {
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 3rem;
+    text-align: center;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
+    border-radius: 0.25rem;
+}
+
+/* Quantity Control */
+.quantity-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quantity-input {
+    max-width: 8rem;
+    text-align: center;
+}
+
+.quantity-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;

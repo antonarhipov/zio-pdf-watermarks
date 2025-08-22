@@ -55,6 +55,26 @@ object HttpServerTest extends ZIOSpecDefault {
           _ = sessions.put(sessionId, updatedSession)
         } yield updatedSession
       
+      def updateDocumentProcessedFilePath(sessionId: String, processedFilePath: String): IO[DomainError, UserSession] =
+        for {
+          session <- getSession(sessionId)
+          document <- ZIO.fromOption(session.uploadedDocument)
+            .orElseFail(DomainError.SessionNotFound(sessionId))
+          updatedDocument = document.copy(processedFilePath = Some(processedFilePath))
+          updatedSession = session.copy(uploadedDocument = Some(updatedDocument), lastActivity = Instant.now())
+          _ = sessions.put(sessionId, updatedSession)
+        } yield updatedSession
+      
+      def updateDocumentStatus(sessionId: String, newStatus: DocumentStatus): IO[DomainError, UserSession] =
+        for {
+          session <- getSession(sessionId)
+          document <- ZIO.fromOption(session.uploadedDocument)
+            .orElseFail(DomainError.SessionNotFound(sessionId))
+          updatedDocument = document.copy(status = newStatus)
+          updatedSession = session.copy(uploadedDocument = Some(updatedDocument), lastActivity = Instant.now())
+          _ = sessions.put(sessionId, updatedSession)
+        } yield updatedSession
+      
       def cleanupExpiredSessions(): UIO[Unit] = ZIO.unit
     }
   )
