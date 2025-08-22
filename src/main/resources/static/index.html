@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PDF Watermarking Application - Add watermarks to your PDF documents">
+    <title>PDF Watermarking Application</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="container">
+                <h1 class="logo">
+                    <span class="logo-icon">📄</span>
+                    PDF Watermarking
+                </h1>
+                <nav class="nav">
+                    <a href="#upload" class="nav-link active">Upload</a>
+                    <a href="#configure" class="nav-link">Configure</a>
+                    <a href="#download" class="nav-link">Download</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Upload Section -->
+                <section id="upload-section" class="section active">
+                    <div class="section-header">
+                        <h2>Upload Your PDF</h2>
+                        <p class="section-description">
+                            Select or drag and drop a PDF file to add watermarks
+                        </p>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </div>
+                            <h3 class="upload-title">Drop your PDF file here</h3>
+                            <p class="upload-subtitle">or click to browse your files</p>
+                            <input type="file" id="file-input" class="file-input" accept=".pdf,application/pdf" multiple="false">
+                            <button type="button" class="upload-button" id="upload-button">
+                                Choose PDF File
+                            </button>
+                        </div>
+
+                        <!-- Drag Over State -->
+                        <div class="drag-overlay" id="drag-overlay">
+                            <div class="drag-content">
+                                <div class="drag-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7,10 12,15 17,10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                </div>
+                                <h3>Drop your PDF file here</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="upload-progress">
+                        <div class="progress-header">
+                            <span class="progress-filename" id="progress-filename">document.pdf</span>
+                            <span class="progress-percentage" id="progress-percentage">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
+                        <div class="progress-status" id="progress-status">
+                            Preparing upload...
+                        </div>
+                    </div>
+
+                    <!-- Upload Success -->
+                    <div class="upload-success" id="upload-success">
+                        <div class="success-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Upload Successful!</h3>
+                        <p class="success-message" id="success-message">
+                            Your PDF has been uploaded successfully.
+                        </p>
+                        <div class="success-actions">
+                            <button type="button" class="button button-primary" id="configure-watermark-btn">
+                                Configure Watermark
+                            </button>
+                            <button type="button" class="button button-secondary" id="upload-another-btn">
+                                Upload Another File
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Error -->
+                    <div class="upload-error" id="upload-error">
+                        <div class="error-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>Upload Failed</h3>
+                        <p class="error-message" id="error-message">
+                            Please try again or contact support if the problem persists.
+                        </p>
+                        <div class="error-actions">
+                            <button type="button" class="button button-primary" id="retry-upload-btn">
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Configuration Section (Placeholder for future tasks) -->
+                <section id="configure-section" class="section">
+                    <div class="section-header">
+                        <h2>Configure Watermark</h2>
+                        <p class="section-description">
+                            Customize your watermark settings
+                        </p>
+                    </div>
+                    <div class="coming-soon">
+                        <h3>Coming Soon</h3>
+                        <p>Watermark configuration will be available in the next phase.</p>
+                    </div>
+                </section>
+
+                <!-- Download Section (Placeholder for future tasks) -->
+                <section id="download-section" class="section">
+                    <div class="section-header">
+                        <h2>Download Result</h2>
+                        <p class="section-description">
+                            Download your watermarked PDF
+                        </p>
+                    </div>
+                    <div class="coming-soon">
+                        <h3>Coming Soon</h3>
+                        <p>File download will be available in the next phase.</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 PDF Watermarking Application. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h3>Processing...</h3>
+                <p id="loading-message">Please wait while we process your request.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

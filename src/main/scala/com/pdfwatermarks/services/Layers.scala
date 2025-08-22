@@ -21,19 +21,33 @@ object Layers {
     WatermarkRenderingService & 
     FileManagementService & 
     SessionManagementService & 
-    ValidationService
+    ValidationService &
+    TempFileManagementService
   ] = {
+    import com.pdfwatermarks.config.TempFileConfig
+    
+    val tempFileConfig = TempFileConfig(
+      baseDir = "./tmp",
+      maxAgeHours = 24,
+      maxTotalSizeMb = 1024,
+      cleanupIntervalMinutes = 60,
+      uploadPrefix = "upload-",
+      processedPrefix = "processed-"
+    )
+    
     val pdfProcessingLayer = ZLayer.succeed(PdfProcessingServiceLive())
     val watermarkRenderingLayer = ZLayer.succeed(WatermarkRenderingServiceLive()) 
     val fileManagementLayer = ZLayer.succeed(FileManagementServiceLive())
     val sessionManagementLayer = ZLayer.succeed(SessionManagementServiceLive())
     val validationLayer = ZLayer.succeed(ValidationServiceLive())
+    val tempFileManagementLayer = ZLayer.succeed(tempFileConfig) >>> TempFileManagementService.layer
     
     pdfProcessingLayer ++
     watermarkRenderingLayer ++
     fileManagementLayer ++
     sessionManagementLayer ++
-    validationLayer
+    validationLayer ++
+    tempFileManagementLayer
   }
 
   /**
@@ -44,19 +58,33 @@ object Layers {
     WatermarkRenderingService &
     FileManagementService &
     SessionManagementService &
-    ValidationService
+    ValidationService &
+    TempFileManagementService
   ] = {
+    import com.pdfwatermarks.config.TempFileConfig
+    
+    val tempFileConfig = TempFileConfig(
+      baseDir = "./test-tmp",
+      maxAgeHours = 1,
+      maxTotalSizeMb = 10,
+      cleanupIntervalMinutes = 5,
+      uploadPrefix = "test-upload-",
+      processedPrefix = "test-processed-"
+    )
+    
     val pdfProcessingTestLayer = ZLayer.succeed(PdfProcessingServiceTest())
     val watermarkRenderingTestLayer = ZLayer.succeed(WatermarkRenderingServiceTest())
     val fileManagementTestLayer = ZLayer.succeed(FileManagementServiceTest())
     val sessionManagementTestLayer = ZLayer.succeed(SessionManagementServiceTest())
     val validationTestLayer = ZLayer.succeed(ValidationServiceTest())
+    val tempFileManagementTestLayer = ZLayer.succeed(tempFileConfig) >>> TempFileManagementService.layer
     
     pdfProcessingTestLayer ++
     watermarkRenderingTestLayer ++
     fileManagementTestLayer ++
     sessionManagementTestLayer ++
-    validationTestLayer
+    validationTestLayer ++
+    tempFileManagementTestLayer
   }
 
   // ========== Live Service Implementations ==========

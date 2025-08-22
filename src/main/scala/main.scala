@@ -2,6 +2,7 @@
 package com.pdfwatermarks
 
 import zio._
+import zio.http.Server
 import zio.logging.backend.SLF4J
 import com.pdfwatermarks.http.HttpServer
 import com.pdfwatermarks.services.Layers
@@ -30,7 +31,11 @@ object PdfWatermarkApp extends ZIOAppDefault {
       config = HttpServer.ServerConfig(port = 8080, host = "0.0.0.0")
       _ <- ZIO.logInfo(s"Configuring HTTP server on ${config.host}:${config.port}")
       _ <- ZIO.logInfo("Application services initialized successfully")
-      exitCode <- HttpServer.runWithGracefulShutdown(config)
+      serverConfig = Server.Config.default.port(config.port).binding(config.host, config.port)
+      serverLayer = ZLayer.succeed(serverConfig) >>> Server.live
+      exitCode <- HttpServer.runWithGracefulShutdown(config).provide(
+        Layers.appLayer >+> serverLayer
+      )
     } yield exitCode
 
   /**
