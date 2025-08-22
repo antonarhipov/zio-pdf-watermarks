@@ -71,6 +71,21 @@ class PDFWatermarkApp {
         this.applyButton = document.getElementById('apply-watermark');
         this.formErrors = document.getElementById('form-errors');
         this.errorList = document.getElementById('error-list');
+        
+        // Download section elements
+        this.processingStatus = document.getElementById('processing-status');
+        this.downloadReady = document.getElementById('download-ready');
+        this.processingError = document.getElementById('processing-error');
+        this.statusMessage = document.getElementById('status-message');
+        this.processingProgressBar = document.getElementById('processing-progress-bar');
+        this.downloadMessage = document.getElementById('download-message');
+        this.resultFilename = document.getElementById('result-filename');
+        this.resultFilesize = document.getElementById('result-filesize');
+        this.downloadBtn = document.getElementById('download-btn');
+        this.processAnotherBtn = document.getElementById('process-another-btn');
+        this.retryProcessingBtn = document.getElementById('retry-processing-btn');
+        this.startOverBtn = document.getElementById('start-over-btn');
+        this.processingErrorMessage = document.getElementById('processing-error-message');
     }
     
     /**
@@ -524,6 +539,12 @@ class PDFWatermarkApp {
         // Preview button
         this.previewButton.addEventListener('click', () => this.handlePreview());
         
+        // Download section events
+        this.downloadBtn?.addEventListener('click', () => this.handleDownload());
+        this.processAnotherBtn?.addEventListener('click', () => this.handleProcessAnother());
+        this.retryProcessingBtn?.addEventListener('click', () => this.handleRetryProcessing());
+        this.startOverBtn?.addEventListener('click', () => this.handleStartOver());
+        
         // Initialize default values
         this.handlePositionChange();
         this.handleFontSizeChange();
@@ -770,7 +791,8 @@ class PDFWatermarkApp {
             if (result.success) {
                 this.hideLoading();
                 this.navigateToSection('download');
-                this.showNotification('Watermark applied successfully!', 'success');
+                this.showProcessingStatus();
+                this.pollProcessingStatus(result.sessionId);
             } else {
                 this.hideLoading();
                 this.showNotification(result.message || 'Failed to apply watermark', 'error');
@@ -781,6 +803,160 @@ class PDFWatermarkApp {
             this.hideLoading();
             this.showNotification('Failed to apply watermark. Please try again.', 'error');
         }
+    }
+    
+    /**
+     * Show processing status in download section
+     */
+    showProcessingStatus() {
+        this.processingStatus.style.display = 'block';
+        this.downloadReady.style.display = 'none';
+        this.processingError.style.display = 'none';
+        
+        this.statusMessage.textContent = 'Applying watermarks to your document...';
+        this.processingProgressBar.style.width = '0%';
+    }
+    
+    /**
+     * Poll processing status until completion
+     */
+    async pollProcessingStatus(sessionId) {
+        const maxAttempts = 60; // 60 attempts = 30 seconds with 0.5s intervals
+        let attempts = 0;
+        
+        const poll = async () => {
+            try {
+                const response = await fetch(`/api/watermark/status/${sessionId}`);
+                const status = await response.json();
+                
+                this.updateProcessingProgress(status);
+                
+                if (status.status === 'completed') {
+                    this.showDownloadReady(status);
+                } else if (status.status === 'failed' || status.status === 'error') {
+                    this.showProcessingError(status.message);
+                } else if (attempts < maxAttempts) {
+                    attempts++;
+                    setTimeout(poll, 500); // Poll every 0.5 seconds
+                } else {
+                    this.showProcessingError('Processing timeout - please try again');
+                }
+            } catch (error) {
+                console.error('Status polling error:', error);
+                this.showProcessingError('Failed to check processing status');
+            }
+        };
+        
+        poll();
+    }
+    
+    /**
+     * Update processing progress bar
+     */
+    updateProcessingProgress(status) {
+        this.processingProgressBar.style.width = `${status.progress || 0}%`;
+        this.statusMessage.textContent = status.message || 'Processing...';
+    }
+    
+    /**
+     * Show download ready state
+     */
+    showDownloadReady(status) {
+        this.processingStatus.style.display = 'none';
+        this.downloadReady.style.display = 'block';
+        this.processingError.style.display = 'none';
+        
+        this.downloadMessage.textContent = 'Your watermarked PDF is ready for download.';
+        
+        if (status.downloadUrl) {
+            this.downloadBtn.setAttribute('data-download-url', status.downloadUrl);
+        }
+        
+        // Update file info if available
+        if (status.filename) {
+            this.resultFilename.textContent = status.filename;
+        }
+        if (status.filesize) {
+            this.resultFilesize.textContent = this.formatFileSize(status.filesize);
+        }
+    }
+    
+    /**
+     * Show processing error state
+     */
+    showProcessingError(message) {
+        this.processingStatus.style.display = 'none';
+        this.downloadReady.style.display = 'none';
+        this.processingError.style.display = 'block';
+        
+        this.processingErrorMessage.textContent = message || 'An error occurred while processing your PDF.';
+    }
+    
+    /**
+     * Handle download button click
+     */
+    async handleDownload() {
+        try {
+            const downloadUrl = this.downloadBtn.getAttribute('data-download-url') || `/api/download/${this.currentSessionId}`;
+            
+            // Create a temporary link to trigger download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = this.resultFilename.textContent || 'watermarked.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.showNotification('Download started successfully!', 'success');
+        } catch (error) {
+            console.error('Download error:', error);
+            this.showNotification('Failed to start download. Please try again.', 'error');
+        }
+    }
+    
+    /**
+     * Handle process another file
+     */
+    handleProcessAnother() {
+        // Reset to upload section
+        this.navigateToSection('upload');
+        this.resetUploadSection();
+        this.resetConfigureSection();
+    }
+    
+    /**
+     * Handle retry processing
+     */
+    async handleRetryProcessing() {
+        if (!this.currentSessionId) {
+            this.showNotification('No session available for retry', 'error');
+            return;
+        }
+        
+        // Go back to configure section
+        this.navigateToSection('configure');
+    }
+    
+    /**
+     * Handle start over
+     */
+    handleStartOver() {
+        // Reset everything and go to upload
+        this.currentSessionId = null;
+        this.navigateToSection('upload');
+        this.resetUploadSection();
+        this.resetConfigureSection();
+    }
+    
+    /**
+     * Format file size for display
+     */
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
     /**

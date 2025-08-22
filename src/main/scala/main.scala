@@ -28,12 +28,27 @@ object PdfWatermarkApp extends ZIOAppDefault {
   override def run: ZIO[Any, Any, Any] =
     for {
       _ <- ZIO.logInfo("Starting PDF Watermarking Application")
-      config = HttpServer.ServerConfig(port = 8080, host = "0.0.0.0")
-      _ <- ZIO.logInfo(s"Configuring HTTP server on ${config.host}:${config.port}")
+      appConfig <- ZIO.serviceWithZIO[com.pdfwatermarks.config.ApplicationConfig] { config =>
+        ZIO.succeed(config)
+      }.provide(Layers.appLayer)
+      httpConfig = appConfig.http
+      serverHttpConfig = HttpServer.ServerConfig(port = httpConfig.port, host = httpConfig.host)
+      _ <- ZIO.logInfo(s"Configuring HTTP server on ${httpConfig.host}:${httpConfig.port}")
+      _ <- ZIO.logInfo(s"Max request size: ${httpConfig.maxRequestSizeBytes} bytes")
+      
+      // Initialize temporary file management service
+      _ <- ZIO.serviceWithZIO[com.pdfwatermarks.services.TempFileManagementService] { service =>
+        service.initialize()
+      }.provide(Layers.appLayer).mapError(error => new RuntimeException(s"Failed to initialize temp file service: $error")).orDie
+      _ <- ZIO.logInfo("Temporary file management service initialized")
+      
       _ <- ZIO.logInfo("Application services initialized successfully")
-      serverConfig = Server.Config.default.port(config.port).binding(config.host, config.port)
+      serverConfig = Server.Config.default
+        .port(httpConfig.port)
+        .binding(httpConfig.host, httpConfig.port)
+        .enableRequestStreaming
       serverLayer = ZLayer.succeed(serverConfig) >>> Server.live
-      exitCode <- HttpServer.runWithGracefulShutdown(config).provide(
+      exitCode <- HttpServer.runWithGracefulShutdown(serverHttpConfig).provide(
         Layers.appLayer >+> serverLayer
       )
     } yield exitCode

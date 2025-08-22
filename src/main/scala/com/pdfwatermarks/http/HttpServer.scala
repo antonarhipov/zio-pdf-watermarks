@@ -74,6 +74,146 @@ object HttpServer {
   }
 
   /**
+   * Intermediate request model for watermark apply endpoint that matches frontend JSON structure.
+   */
+  final case class WatermarkApplyRequest(
+    sessionId: String,
+    config: FrontendWatermarkConfig
+  )
+
+  final case class FrontendWatermarkConfig(
+    text: String,
+    position: FrontendPositionConfig,
+    orientation: FrontendOrientationConfig,
+    fontSize: FrontendFontSizeConfig,
+    color: FrontendColorConfig,
+    quantity: Int
+  )
+
+  final case class FrontendPositionConfig(
+    `type`: String,
+    x: Option[Double] = None,
+    y: Option[Double] = None
+  )
+
+  final case class FrontendOrientationConfig(
+    `type`: String,
+    angle: Option[Double] = None
+  )
+
+  final case class FrontendFontSizeConfig(
+    `type`: String,
+    size: Option[Double] = None
+  )
+
+  final case class FrontendColorConfig(
+    `type`: String,
+    color: Option[String] = None
+  )
+
+  object WatermarkApplyRequest {
+    implicit val encoder: JsonEncoder[WatermarkApplyRequest] = DeriveJsonEncoder.gen[WatermarkApplyRequest]
+    implicit val decoder: JsonDecoder[WatermarkApplyRequest] = DeriveJsonDecoder.gen[WatermarkApplyRequest]
+  }
+
+  object FrontendWatermarkConfig {
+    implicit val encoder: JsonEncoder[FrontendWatermarkConfig] = DeriveJsonEncoder.gen[FrontendWatermarkConfig]
+    implicit val decoder: JsonDecoder[FrontendWatermarkConfig] = DeriveJsonDecoder.gen[FrontendWatermarkConfig]
+  }
+
+  object FrontendPositionConfig {
+    implicit val encoder: JsonEncoder[FrontendPositionConfig] = DeriveJsonEncoder.gen[FrontendPositionConfig]
+    implicit val decoder: JsonDecoder[FrontendPositionConfig] = DeriveJsonDecoder.gen[FrontendPositionConfig]
+  }
+
+  object FrontendOrientationConfig {
+    implicit val encoder: JsonEncoder[FrontendOrientationConfig] = DeriveJsonEncoder.gen[FrontendOrientationConfig]
+    implicit val decoder: JsonDecoder[FrontendOrientationConfig] = DeriveJsonDecoder.gen[FrontendOrientationConfig]
+  }
+
+  object FrontendFontSizeConfig {
+    implicit val encoder: JsonEncoder[FrontendFontSizeConfig] = DeriveJsonEncoder.gen[FrontendFontSizeConfig]
+    implicit val decoder: JsonDecoder[FrontendFontSizeConfig] = DeriveJsonDecoder.gen[FrontendFontSizeConfig]
+  }
+
+  object FrontendColorConfig {
+    implicit val encoder: JsonEncoder[FrontendColorConfig] = DeriveJsonEncoder.gen[FrontendColorConfig]
+    implicit val decoder: JsonDecoder[FrontendColorConfig] = DeriveJsonDecoder.gen[FrontendColorConfig]
+  }
+
+  /**
+   * Convert frontend watermark config format to domain config format.
+   */
+  private def convertFrontendConfig(frontendConfig: FrontendWatermarkConfig): IO[DomainError, WatermarkConfig] = {
+    for {
+      position <- frontendConfig.position.`type` match {
+        case "fixed" => 
+          for {
+            x <- ZIO.fromOption(frontendConfig.position.x).orElseFail(DomainError.InvalidConfiguration(List("Missing x coordinate for fixed position")))
+            y <- ZIO.fromOption(frontendConfig.position.y).orElseFail(DomainError.InvalidConfiguration(List("Missing y coordinate for fixed position")))
+          } yield PositionConfig.Fixed(x, y)
+        case "random" => 
+          ZIO.succeed(PositionConfig.Random)
+        case other => 
+          ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid position type: $other")))
+      }
+      
+      orientation <- frontendConfig.orientation.`type` match {
+        case "fixed" => 
+          val angle = frontendConfig.orientation.angle.getOrElse(0.0)
+          ZIO.succeed(OrientationConfig.Fixed(angle))
+        case "random" => 
+          ZIO.succeed(OrientationConfig.Random)
+        case other => 
+          ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid orientation type: $other")))
+      }
+      
+      fontSize <- frontendConfig.fontSize.`type` match {
+        case "fixed" => 
+          for {
+            size <- ZIO.fromOption(frontendConfig.fontSize.size).orElseFail(DomainError.InvalidConfiguration(List("Missing size for fixed font size")))
+          } yield FontSizeConfig.Fixed(size)
+        case other => 
+          ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid font size type: $other")))
+      }
+      
+      color <- frontendConfig.color.`type` match {
+        case "fixed" => 
+          for {
+            colorValue <- ZIO.fromOption(frontendConfig.color.color).orElseFail(DomainError.InvalidConfiguration(List("Missing color value for fixed color")))
+            javaColor <- convertHexToColor(colorValue)
+          } yield ColorConfig.Fixed(javaColor)
+        case other => 
+          ZIO.fail(DomainError.InvalidConfiguration(List(s"Invalid color type: $other")))
+      }
+      
+    } yield WatermarkConfig(
+      text = frontendConfig.text,
+      position = position,
+      orientation = orientation,
+      fontSize = fontSize,
+      color = color,
+      quantity = frontendConfig.quantity
+    )
+  }
+
+  /**
+   * Convert hex color string to java.awt.Color.
+   */
+  private def convertHexToColor(hexColor: String): IO[DomainError, java.awt.Color] = {
+    ZIO.attempt {
+      val cleanHex = if (hexColor.startsWith("#")) hexColor.substring(1) else hexColor
+      if (cleanHex.length != 6) {
+        throw new IllegalArgumentException(s"Invalid hex color format: $hexColor")
+      }
+      val r = Integer.parseInt(cleanHex.substring(0, 2), 16)
+      val g = Integer.parseInt(cleanHex.substring(2, 4), 16)
+      val b = Integer.parseInt(cleanHex.substring(4, 6), 16)
+      new java.awt.Color(r, g, b)
+    }.mapError(err => DomainError.InvalidConfiguration(List(s"Invalid hex color '$hexColor': ${err.getMessage}")))
+  }
+
+  /**
    * Static file serving helper.
    */
   private def serveStaticFile(path: String): ZIO[Any, Throwable, Response] = {
@@ -137,22 +277,16 @@ object HttpServer {
       Response.json(healthResponse.toJson)
     },
 
-    // Root endpoint - serve simple HTML
-    Method.GET / "" -> Handler.fromFunction { _ =>
-      Response.html("""<!DOCTYPE html>
-<html>
-<head>
-    <title>PDF Watermarking Application</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <h1>PDF Watermarking Application</h1>
-    <p>Server is running and ready to accept requests.</p>
-    <p><a href="/health">Health Check</a></p>
-    <p><a href="/api/health">API Health Check</a></p>
-</body>
-</html>""")
+    // Root endpoint - serve static index.html
+    Method.GET / "" -> Handler.fromZIO {
+      serveStaticFile("index.html").orElse(ZIO.succeed(Response.status(Status.NotFound)))
+    },
+
+    // Static file serving for all other static assets  
+    Method.GET / "static" / trailing -> Handler.fromFunctionZIO { (req: Request) =>
+      val pathSegments = req.path.segments.drop(1) // Remove "static" segment
+      val filePath = pathSegments.mkString("/")
+      serveStaticFile(filePath).orElse(ZIO.succeed(Response.status(Status.NotFound)))
     }
   )
 
@@ -166,6 +300,87 @@ object HttpServer {
    * Watermark processing routes (Tasks 52, 53, 54, 55).
    */
   val watermarkProcessingRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService & DownloadTrackingService, Response] = Routes(
+    // Apply watermark endpoint - combines config and processing (Frontend integration)
+    Method.POST / "api" / "watermark" / "apply" -> handler { (req: Request) =>
+      for {
+        _ <- ZIO.logInfo(s"Received watermark apply request from ${req.remoteAddress.getOrElse("unknown")}")
+        
+        // Parse JSON request body with sessionId and config
+        body <- req.body.asString
+        applyRequest <- ZIO.fromEither(body.fromJson[WatermarkApplyRequest])
+          .mapError(error => DomainError.InvalidConfiguration(List(s"Invalid JSON: $error")))
+        
+        // Convert frontend config format to domain config format
+        config <- convertFrontendConfig(applyRequest.config)
+        
+        // Get session and validate it has an uploaded document
+        session <- SessionManagementService.getSession(applyRequest.sessionId)
+        document <- ZIO.fromOption(session.uploadedDocument)
+          .orElseFail(DomainError.InvalidConfiguration(List("No document uploaded in session")))
+        
+        // Update session with watermark configuration
+        _ <- SessionManagementService.updateSessionWithConfig(applyRequest.sessionId, config)
+        
+        // Update document status to Processing
+        _ <- SessionManagementService.updateDocumentStatus(applyRequest.sessionId, DocumentStatus.Processing)
+        
+        // Create processing job ID
+        jobId = java.util.UUID.randomUUID().toString
+        
+        // Start watermark processing asynchronously
+        _ <- {
+          for {
+            _ <- ZIO.logInfo(s"Starting watermark processing for session ${applyRequest.sessionId}, job $jobId")
+            
+            // Apply watermarks to PDF
+            processedFile <- PdfProcessingService.applyWatermarks(document, config)
+            
+            // Store the processed file path in the document
+            _ <- SessionManagementService.updateDocumentProcessedFilePath(applyRequest.sessionId, processedFile.getAbsolutePath)
+            
+            // Update document status to Completed on success
+            _ <- SessionManagementService.updateDocumentStatus(applyRequest.sessionId, DocumentStatus.Completed)
+            
+            _ <- ZIO.logInfo(s"Watermark processing completed for job $jobId")
+            
+          } yield ()
+        }.catchAll { error =>
+          // Update document status to Failed on error
+          for {
+            _ <- SessionManagementService.updateDocumentStatus(applyRequest.sessionId, DocumentStatus.Failed(error.toString))
+            _ <- ZIO.logError(s"Watermark processing failed for job $jobId: $error")
+          } yield ()
+        }.forkDaemon // Run processing in background
+        
+        _ <- ZIO.logInfo(s"Watermark apply completed for session ${applyRequest.sessionId}")
+        
+        response = ProcessWatermarkResponse(
+          success = true,
+          sessionId = applyRequest.sessionId,
+          jobId = Some(jobId),
+          message = "Watermark applied successfully"
+        )
+        
+      } yield Response.json(response.toJson)
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Watermark apply failed: $error") *>
+        ZIO.succeed {
+          val errorResponse = ProcessWatermarkResponse(
+            success = false,
+            sessionId = "",
+            message = error match {
+              case DomainError.SessionNotFound(sessionId) => s"Session not found: $sessionId"
+              case DomainError.InvalidConfiguration(errors) => s"Invalid configuration: ${errors.mkString(", ")}"
+              case DomainError.PdfProcessingError(msg) => s"PDF processing failed: $msg"
+              case _ => "Failed to apply watermark"
+            }
+          )
+          Response.json(errorResponse.toJson).status(Status.BadRequest)
+        }
+      }
+    },
+    
     // Submit watermark configuration endpoint (Task 52)
     Method.POST / "api" / "watermark" / "config" -> handler { (req: Request) =>
       for {
@@ -521,28 +736,22 @@ object HttpServer {
       } yield Response.json(healthResponse.toJson)
     },
 
-    // Root endpoint with logging
+    // Root endpoint with logging - serve static index.html
     Method.GET / "" -> handler { (req: Request) =>
       for {
         _ <- logRequest(req)
-      } yield Response(
-        status = Status.Ok,
-        headers = Headers(Header.ContentType(MediaType.text.html)),
-        body = Body.fromString("""<!DOCTYPE html>
-<html>
-<head>
-    <title>PDF Watermarking Application</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <h1>PDF Watermarking Application</h1>
-    <p>Server is running and ready to accept requests.</p>
-    <p><a href="/health">Health Check</a></p>
-    <p><a href="/api/health">API Health Check</a></p>
-</body>
-</html>""")
-      )
+        response <- serveStaticFile("index.html").orElse(ZIO.succeed(Response.status(Status.NotFound)))
+      } yield response
+    },
+
+    // Static file serving for all other static assets with logging
+    Method.GET / "static" / trailing -> handler { (req: Request) =>
+      for {
+        _ <- logRequest(req)
+        pathSegments = req.path.segments.drop(1) // Remove "static" segment
+        filePath = pathSegments.mkString("/")
+        response <- serveStaticFile(filePath).orElse(ZIO.succeed(Response.status(Status.NotFound)))
+      } yield response
     }
   )
 
@@ -570,8 +779,9 @@ object HttpServer {
         // Generate processed filename
         processedFilename <- FileManagementService.generateProcessedFilename(document.filename)
         
-        // Get processed file path
-        processedFilePath = s"/tmp/processed_${document.id}.pdf"
+        // Get processed file path from document
+        processedFilePath <- ZIO.fromOption(document.processedFilePath)
+          .orElseFail(DomainError.DocumentNotFound(s"No processed file path stored for session $sessionId"))
         processedFile = new java.io.File(processedFilePath)
         
         // Check if processed file exists

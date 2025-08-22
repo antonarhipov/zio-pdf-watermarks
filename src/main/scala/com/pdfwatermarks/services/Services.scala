@@ -105,6 +105,204 @@ object WatermarkRenderingService {
     ZIO.serviceWithZIO[WatermarkRenderingService](_.generateRandomColors(text))
 }
 
+// ========== Preview Service ==========
+
+/**
+ * Service for real-time watermark preview functionality.
+ */
+trait PreviewService {
+  /**
+   * Generate a real-time preview render of watermarks.
+   */
+  def generatePreview(
+    pageDimensions: PageDimensions,
+    config: WatermarkConfig,
+    previewConfig: PreviewConfig
+  ): IO[DomainError, PreviewRender]
+  
+  /**
+   * Update preview with zoom changes.
+   */
+  def updateZoom(
+    currentRender: PreviewRender,
+    newZoomLevel: Double
+  ): IO[DomainError, PreviewRender]
+  
+  /**
+   * Update preview with pan offset changes.
+   */
+  def updatePan(
+    currentRender: PreviewRender,
+    newPanOffset: Point
+  ): IO[DomainError, PreviewRender]
+  
+  /**
+   * Optimize preview performance based on configuration complexity.
+   */
+  def optimizePreview(
+    config: WatermarkConfig,
+    previewConfig: PreviewConfig
+  ): IO[Nothing, PreviewConfig]
+  
+  /**
+   * Get performance metrics for current preview.
+   */
+  def getPerformanceMetrics(
+    previewRender: PreviewRender
+  ): IO[Nothing, PreviewPerformance]
+  
+  /**
+   * Check if preview should be updated based on configuration changes.
+   */
+  def shouldUpdatePreview(
+    trigger: PreviewUpdateTrigger,
+    currentConfig: WatermarkConfig
+  ): IO[Nothing, Boolean]
+}
+
+object PreviewService {
+  def generatePreview(
+    pageDimensions: PageDimensions,
+    config: WatermarkConfig,
+    previewConfig: PreviewConfig
+  ): ZIO[PreviewService, DomainError, PreviewRender] =
+    ZIO.serviceWithZIO[PreviewService](_.generatePreview(pageDimensions, config, previewConfig))
+    
+  def updateZoom(
+    currentRender: PreviewRender,
+    newZoomLevel: Double
+  ): ZIO[PreviewService, DomainError, PreviewRender] =
+    ZIO.serviceWithZIO[PreviewService](_.updateZoom(currentRender, newZoomLevel))
+    
+  def updatePan(
+    currentRender: PreviewRender,
+    newPanOffset: Point
+  ): ZIO[PreviewService, DomainError, PreviewRender] =
+    ZIO.serviceWithZIO[PreviewService](_.updatePan(currentRender, newPanOffset))
+    
+  def optimizePreview(
+    config: WatermarkConfig,
+    previewConfig: PreviewConfig
+  ): ZIO[PreviewService, Nothing, PreviewConfig] =
+    ZIO.serviceWithZIO[PreviewService](_.optimizePreview(config, previewConfig))
+    
+  def getPerformanceMetrics(
+    previewRender: PreviewRender
+  ): ZIO[PreviewService, Nothing, PreviewPerformance] =
+    ZIO.serviceWithZIO[PreviewService](_.getPerformanceMetrics(previewRender))
+    
+  def shouldUpdatePreview(
+    trigger: PreviewUpdateTrigger,
+    currentConfig: WatermarkConfig
+  ): ZIO[PreviewService, Nothing, Boolean] =
+    ZIO.serviceWithZIO[PreviewService](_.shouldUpdatePreview(trigger, currentConfig))
+}
+
+// ========== Enhanced UI Service ==========
+
+/**
+ * Service for enhanced user interface functionality.
+ */
+trait EnhancedUIService {
+  /**
+   * Get navigation configuration for current workflow state.
+   */
+  def getNavigationConfig(
+    currentStep: NavigationStep,
+    watermarkConfig: Option[WatermarkConfig]
+  ): IO[Nothing, NavigationConfig]
+  
+  /**
+   * Navigate to next or previous step in workflow.
+   */
+  def navigateToStep(
+    currentStep: NavigationStep,
+    targetStep: NavigationStep,
+    watermarkConfig: Option[WatermarkConfig]
+  ): IO[DomainError, NavigationConfig]
+  
+  /**
+   * Get dynamic form section configurations based on current selections.
+   */
+  def getFormSectionConfigs(
+    watermarkConfig: WatermarkConfig
+  ): IO[Nothing, List[FormSectionConfig]]
+  
+  /**
+   * Generate configuration summary for review page.
+   */
+  def generateConfigurationSummary(
+    watermarkConfig: WatermarkConfig,
+    pageDimensions: PageDimensions
+  ): IO[Nothing, ConfigurationSummary]
+  
+  /**
+   * Get user guidance including tooltips and help messages.
+   */
+  def getUserGuidance(
+    currentStep: NavigationStep,
+    formSection: Option[FormSection]
+  ): IO[Nothing, UserGuidance]
+  
+  /**
+   * Get available keyboard shortcuts for current context.
+   */
+  def getKeyboardShortcuts(
+    currentStep: NavigationStep
+  ): IO[Nothing, List[KeyboardShortcut]]
+  
+  /**
+   * Validate form section dependencies and requirements.
+   */
+  def validateFormDependencies(
+    watermarkConfig: WatermarkConfig,
+    sectionConfigs: List[FormSectionConfig]
+  ): IO[Nothing, List[String]] // Returns list of validation messages
+}
+
+object EnhancedUIService {
+  def getNavigationConfig(
+    currentStep: NavigationStep,
+    watermarkConfig: Option[WatermarkConfig]
+  ): ZIO[EnhancedUIService, Nothing, NavigationConfig] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.getNavigationConfig(currentStep, watermarkConfig))
+    
+  def navigateToStep(
+    currentStep: NavigationStep,
+    targetStep: NavigationStep,
+    watermarkConfig: Option[WatermarkConfig]
+  ): ZIO[EnhancedUIService, DomainError, NavigationConfig] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.navigateToStep(currentStep, targetStep, watermarkConfig))
+    
+  def getFormSectionConfigs(
+    watermarkConfig: WatermarkConfig
+  ): ZIO[EnhancedUIService, Nothing, List[FormSectionConfig]] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.getFormSectionConfigs(watermarkConfig))
+    
+  def generateConfigurationSummary(
+    watermarkConfig: WatermarkConfig,
+    pageDimensions: PageDimensions
+  ): ZIO[EnhancedUIService, Nothing, ConfigurationSummary] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.generateConfigurationSummary(watermarkConfig, pageDimensions))
+    
+  def getUserGuidance(
+    currentStep: NavigationStep,
+    formSection: Option[FormSection]
+  ): ZIO[EnhancedUIService, Nothing, UserGuidance] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.getUserGuidance(currentStep, formSection))
+    
+  def getKeyboardShortcuts(
+    currentStep: NavigationStep
+  ): ZIO[EnhancedUIService, Nothing, List[KeyboardShortcut]] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.getKeyboardShortcuts(currentStep))
+    
+  def validateFormDependencies(
+    watermarkConfig: WatermarkConfig,
+    sectionConfigs: List[FormSectionConfig]
+  ): ZIO[EnhancedUIService, Nothing, List[String]] =
+    ZIO.serviceWithZIO[EnhancedUIService](_.validateFormDependencies(watermarkConfig, sectionConfigs))
+}
+
 // ========== File Management Service ==========
 
 /**
@@ -179,6 +377,22 @@ trait SessionManagementService {
   ): IO[DomainError, UserSession]
   
   /**
+   * Update document status in session.
+   */
+  def updateDocumentStatus(
+    sessionId: String,
+    newStatus: DocumentStatus
+  ): IO[DomainError, UserSession]
+  
+  /**
+   * Update document with processed file path in session.
+   */
+  def updateDocumentProcessedFilePath(
+    sessionId: String,
+    processedFilePath: String
+  ): IO[DomainError, UserSession]
+  
+  /**
    * Clean up expired sessions.
    */
   def cleanupExpiredSessions(): UIO[Unit]
@@ -202,6 +416,18 @@ object SessionManagementService {
     config: WatermarkConfig
   ): ZIO[SessionManagementService, DomainError, UserSession] =
     ZIO.serviceWithZIO[SessionManagementService](_.updateSessionWithConfig(sessionId, config))
+    
+  def updateDocumentStatus(
+    sessionId: String,
+    newStatus: DocumentStatus
+  ): ZIO[SessionManagementService, DomainError, UserSession] =
+    ZIO.serviceWithZIO[SessionManagementService](_.updateDocumentStatus(sessionId, newStatus))
+    
+  def updateDocumentProcessedFilePath(
+    sessionId: String,
+    processedFilePath: String
+  ): ZIO[SessionManagementService, DomainError, UserSession] =
+    ZIO.serviceWithZIO[SessionManagementService](_.updateDocumentProcessedFilePath(sessionId, processedFilePath))
     
   def cleanupExpiredSessions(): ZIO[SessionManagementService, Nothing, Unit] =
     ZIO.serviceWithZIO[SessionManagementService](_.cleanupExpiredSessions())

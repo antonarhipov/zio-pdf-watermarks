@@ -152,6 +152,10 @@ object WatermarkRenderer {
           x = margin + random.nextDouble() * (pageDimensions.width - 2 * margin),
           y = margin + random.nextDouble() * (pageDimensions.height - 2 * margin)
         )
+      case PositionConfig.Template(template) =>
+        // For simplicity, use center position for template case in this legacy renderer
+        // The new service implementations handle templates properly
+        Point(pageDimensions.width / 2, pageDimensions.height / 2)
     }
   }
 
@@ -164,6 +168,17 @@ object WatermarkRenderer {
       case OrientationConfig.Random =>
         val random = new Random(java.lang.System.currentTimeMillis() + index + 1000)
         random.nextDouble() * 360.0
+      case OrientationConfig.Preset(preset) =>
+        preset match {
+          case OrientationPreset.Horizontal => 0.0
+          case OrientationPreset.DiagonalUp => 45.0
+          case OrientationPreset.Vertical => 90.0
+          case OrientationPreset.DiagonalDown => 135.0
+          case OrientationPreset.UpsideDown => 180.0
+          case OrientationPreset.DiagonalUpReverse => 225.0
+          case OrientationPreset.VerticalReverse => 270.0
+          case OrientationPreset.DiagonalDownReverse => 315.0
+        }
     }
   }
 
@@ -176,6 +191,21 @@ object WatermarkRenderer {
       case FontSizeConfig.Random(min, max) =>
         val random = new Random(java.lang.System.currentTimeMillis() + index + 2000)
         min + random.nextDouble() * (max - min)
+      case FontSizeConfig.DynamicScale(baseSize, scaleFactor) =>
+        // For this legacy renderer, use base size directly
+        // The new service implementations handle dynamic scaling properly
+        baseSize * scaleFactor
+      case FontSizeConfig.Recommended(documentType) =>
+        // Use reasonable defaults based on document type
+        documentType match {
+          case DocumentType.Legal => 18.0
+          case DocumentType.Academic => 20.0
+          case DocumentType.Business => 24.0
+          case DocumentType.Certificate => 36.0
+          case DocumentType.Marketing => 32.0
+          case DocumentType.Technical => 22.0
+          case DocumentType.Creative => 28.0
+        }
     }
   }
 
@@ -190,6 +220,28 @@ object WatermarkRenderer {
         // Individual letter coloring will be implemented in Phase 3
         val random = new Random(java.lang.System.currentTimeMillis() + index + 3000)
         new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
+      case ColorConfig.Palette(palette) =>
+        // For this legacy renderer, use a simple palette selection
+        // The new service implementations handle palettes properly
+        val paletteColors = getPaletteColors(palette)
+        if (paletteColors.nonEmpty) {
+          paletteColors(index % paletteColors.length)
+        } else {
+          Color.BLACK // Fallback
+        }
+    }
+  }
+
+  private def getPaletteColors(palette: ColorPalette): List[Color] = {
+    palette match {
+      case ColorPalette.Professional => List(Color.DARK_GRAY, Color.BLUE, Color.BLACK)
+      case ColorPalette.Vibrant => List(Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA)
+      case ColorPalette.Pastel => List(Color.PINK, Color.CYAN, Color.LIGHT_GRAY)
+      case ColorPalette.Monochrome => List(Color.BLACK, Color.GRAY, Color.WHITE)
+      case ColorPalette.Warm => List(Color.RED, Color.ORANGE, Color.YELLOW)
+      case ColorPalette.Cool => List(Color.BLUE, Color.CYAN, Color.GREEN)
+      case ColorPalette.Earth => List(new Color(139, 69, 19), new Color(34, 139, 34), new Color(160, 82, 45))
+      case ColorPalette.Custom(colors) => colors
     }
   }
 

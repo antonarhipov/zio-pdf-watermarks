@@ -118,7 +118,7 @@
                             </svg>
                         </div>
                         <h3>Upload Failed</h3>
-                        <p class="error-message" id="error-message">
+                        <p class="error-message" id="upload-error-message">
                             Please try again or contact support if the problem persists.
                         </p>
                         <div class="error-actions">
@@ -247,7 +247,7 @@
                     </div>
                 </section>
 
-                <!-- Download Section (Placeholder for future tasks) -->
+                <!-- Download Section -->
                 <section id="download-section" class="section">
                     <div class="section-header">
                         <h2>Download Result</h2>
@@ -255,9 +255,79 @@
                             Download your watermarked PDF
                         </p>
                     </div>
-                    <div class="coming-soon">
-                        <h3>Coming Soon</h3>
-                        <p>File download will be available in the next phase.</p>
+
+                    <!-- Processing Status -->
+                    <div class="processing-status" id="processing-status">
+                        <div class="status-icon">
+                            <div class="processing-spinner"></div>
+                        </div>
+                        <h3>Processing Your PDF</h3>
+                        <p class="status-message" id="status-message">
+                            Applying watermarks to your document...
+                        </p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="processing-progress-bar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Download Ready -->
+                    <div class="download-ready" id="download-ready" style="display: none;">
+                        <div class="success-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Watermarks Applied Successfully!</h3>
+                        <p class="download-message" id="download-message">
+                            Your watermarked PDF is ready for download.
+                        </p>
+                        
+                        <!-- File Information -->
+                        <div class="file-info">
+                            <div class="file-details">
+                                <span class="file-name" id="result-filename">watermarked_document.pdf</span>
+                                <span class="file-size" id="result-filesize">0 KB</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Download Actions -->
+                        <div class="download-actions">
+                            <button type="button" class="button button-primary" id="download-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Download PDF
+                            </button>
+                            <button type="button" class="button button-secondary" id="process-another-btn">
+                                Process Another File
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Processing Error -->
+                    <div class="processing-error" id="processing-error" style="display: none;">
+                        <div class="error-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>Processing Failed</h3>
+                        <p class="error-message" id="processing-error-message">
+                            An error occurred while applying watermarks to your PDF.
+                        </p>
+                        <div class="error-actions">
+                            <button type="button" class="button button-primary" id="retry-processing-btn">
+                                Try Again
+                            </button>
+                            <button type="button" class="button button-secondary" id="start-over-btn">
+                                Start Over
+                            </button>
+                        </div>
                     </div>
                 </section>
             </div>

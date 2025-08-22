@@ -254,6 +254,7 @@ object CliApplication extends ZIOAppDefault {
     private def formatPositionConfig(config: PositionConfig): String = config match {
       case PositionConfig.Fixed(x, y) => f"Fixed ($x%.1f, $y%.1f)"
       case PositionConfig.Random => "Random"
+      case PositionConfig.Template(template) => s"Template: ${template.toString}"
     }
 
     /**
@@ -262,6 +263,7 @@ object CliApplication extends ZIOAppDefault {
     private def formatOrientationConfig(config: OrientationConfig): String = config match {
       case OrientationConfig.Fixed(angle) => f"Fixed $angle%.1f°"
       case OrientationConfig.Random => "Random"
+      case OrientationConfig.Preset(preset) => s"Preset: ${preset.toString}"
     }
 
     /**
@@ -270,6 +272,8 @@ object CliApplication extends ZIOAppDefault {
     private def formatFontSizeConfig(config: FontSizeConfig): String = config match {
       case FontSizeConfig.Fixed(size) => f"Fixed $size%.1f pt"
       case FontSizeConfig.Random(min, max) => f"Random $min%.1f-$max%.1f pt"
+      case FontSizeConfig.DynamicScale(baseSize, scaleFactor) => f"Dynamic scaling $baseSize%.1f pt × $scaleFactor%.2f"
+      case FontSizeConfig.Recommended(documentType) => s"Recommended for ${documentType.toString}"
     }
 
     /**
@@ -278,6 +282,7 @@ object CliApplication extends ZIOAppDefault {
     private def formatColorConfig(config: ColorConfig): String = config match {
       case ColorConfig.Fixed(color) => s"Fixed (${color.getRed}, ${color.getGreen}, ${color.getBlue})"
       case ColorConfig.RandomPerLetter => "Random per letter"
+      case ColorConfig.Palette(palette) => s"Color palette: ${palette.toString}"
     }
   }
 

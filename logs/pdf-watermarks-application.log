@@ -1,0 +1,410 @@
+2025-08-22 13:07:06.244 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:07:06.246 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:07:06.247 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:07:07.063 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:07:07.063 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:07:07.088 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:07:14.527 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:07:19.657 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /health
+2025-08-22 13:07:22.295 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /api/health
+2025-08-22 13:17:16.401 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:29:43.505 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:29:43.505 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 13:30:00.388 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:30:00.390 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:30:00.391 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:30:01.199 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:30:01.199 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:30:01.232 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:30:06.269 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:30:09.166 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:46:21.504 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:46:21.510 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:46:21.511 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:46:22.777 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:46:22.780 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:46:25.010 [ZScheduler-Worker-9] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
+2025-08-22 13:46:44.466 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:46:44.466 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 13:47:03.860 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:47:03.864 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:47:03.865 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:47:04.990 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:47:04.994 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:47:05.077 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:47:57.022 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:49:23.953 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:49:23.956 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 13:50:14.658 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:50:14.662 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:50:14.663 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:50:15.741 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:50:15.743 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:50:15.821 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:50:28.975 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:50:29.043 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 13:50:29.050 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 13:50:45.823 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:50:45.829 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 13:52:13.995 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:52:13.996 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:52:13.996 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:52:14.779 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:52:14.780 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:52:14.803 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:52:17.584 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:52:17.620 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 13:52:17.634 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 13:52:49.455 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 13:53:13.607 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 13:53:13.618 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 13:53:13.618 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 13:53:31.620 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:53:31.620 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 13:59:01.037 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 13:59:01.323 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 13:59:01.324 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 13:59:01.324 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 13:59:02.403 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 13:59:02.404 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 13:59:02.471 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 13:59:20.671 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 13:59:20.675 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:07:57.720 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:07:57.827 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:07:57.827 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:07:57.828 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:07:58.601 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:07:58.602 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:07:58.632 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:08:02.350 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 14:08:02.367 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:08:02.367 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 14:08:07.965 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 14:08:08.207 [ZScheduler-Worker-8] ERROR com.pdfwatermarks.http.HttpServer - File upload failed: InternalError(Failed to create temp file: ./tmp/upload-1755860888203-9dd16f2a.PDF)
+2025-08-22 14:08:10.375 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:13:59.123 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:13:59.445 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:13:59.447 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:13:59.515 [ZScheduler-Worker-4] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:13:59.519 [ZScheduler-Worker-4] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:13:59.533 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:13:59.536 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:14:00.606 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:14:00.607 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:14:02.800 [ZScheduler-Worker-3] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
+2025-08-22 14:14:18.533 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:14:18.535 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:14:39.660 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:14:40.002 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:14:40.003 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:14:40.066 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:14:40.068 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:14:40.077 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:14:40.078 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:14:41.130 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:14:41.132 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:14:41.200 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:14:58.454 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:14:58.455 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:22:38.161 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:22:38.264 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:22:38.264 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:22:38.276 [ZScheduler-Worker-11] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:22:38.277 [ZScheduler-Worker-11] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:22:38.279 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:22:38.279 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:22:38.944 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:22:38.944 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:22:38.975 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:23:50.692 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 14:23:50.712 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:23:50.712 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 14:23:55.873 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 14:23:56.081 [ZScheduler-Worker-6] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755861836080-f448bcc5.PDF
+2025-08-22 14:23:56.116 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755861836080-f448bcc5.PDF
+2025-08-22 14:23:56.178 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755861836080-f448bcc5.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 14:23:56.196 [ZScheduler-Worker-6] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.064S - Success: true
+2025-08-22 14:23:56.197 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session dcb201b1-696d-4972-bd2e-355c74b2fd5d
+2025-08-22 14:23:57.218 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: dcb201b1-696d-4972-bd2e-355c74b2fd5d
+2025-08-22 14:28:16.629 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:28:16.629 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:31:37.258 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:31:37.605 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:31:37.605 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:31:37.664 [ZScheduler-Worker-3] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:31:37.667 [ZScheduler-Worker-3] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:31:37.676 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:31:37.677 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:31:38.766 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:31:38.768 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:31:38.844 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:31:59.673 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 14:31:59.815 [ZScheduler-Worker-11] ERROR com.pdfwatermarks.http.HttpServer - Watermark apply failed: InvalidConfiguration(List(Invalid JSON: .config.position(invalid disambiguator)))
+2025-08-22 14:33:57.158 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:33:57.160 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:36:58.058 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:36:58.330 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:36:58.331 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:36:58.388 [ZScheduler-Worker-0] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:36:58.390 [ZScheduler-Worker-0] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:36:58.399 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:36:58.402 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:36:59.686 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:36:59.688 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:37:00.080 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:37:43.962 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 14:37:44.113 [ZScheduler-Worker-8] ERROR com.pdfwatermarks.http.HttpServer - Watermark apply failed: SessionNotFound(test-session)
+2025-08-22 14:37:53.878 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:37:53.881 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:40:36.951 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:40:37.046 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:40:37.047 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:40:37.058 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:40:37.060 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:40:37.061 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:40:37.062 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:40:37.837 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:40:37.837 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:40:37.866 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:41:28.887 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 14:41:28.900 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:41:28.901 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 14:41:36.224 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 14:41:36.486 [ZScheduler-Worker-11] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755862896485-33ef4562.PDF
+2025-08-22 14:41:36.506 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755862896485-33ef4562.PDF
+2025-08-22 14:41:36.557 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755862896485-33ef4562.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 14:41:36.574 [ZScheduler-Worker-11] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.053S - Success: true
+2025-08-22 14:41:36.575 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session 32ac09e6-e9ef-4674-bda0-2b7617a328b8
+2025-08-22 14:41:37.596 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: 32ac09e6-e9ef-4674-bda0-2b7617a328b8
+2025-08-22 14:42:01.017 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 14:42:01.056 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Watermark apply completed for session 32ac09e6-e9ef-4674-bda0-2b7617a328b8
+2025-08-22 14:42:01.056 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Starting watermark processing for session 32ac09e6-e9ef-4674-bda0-2b7617a328b8, job 1dc3a951-43fb-4373-ae9c-6720341e725c
+2025-08-22 14:42:01.059 [zio-default-blocking-1] WARN  c.p.s.L.PdfProcessingServiceLive - Watermark application needs actual file path - placeholder implementation
+2025-08-22 14:45:24.806 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 14:45:24.830 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:45:24.830 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 14:47:40.956 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 14:47:41.075 [ZScheduler-Worker-13] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755863261074-c682076c.PDF
+2025-08-22 14:47:41.083 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755863261074-c682076c.PDF
+2025-08-22 14:47:41.089 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755863261074-c682076c.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 14:47:41.089 [ZScheduler-Worker-13] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.006S - Success: true
+2025-08-22 14:47:41.089 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session 339dae00-56d1-4cc2-b7c8-316a0ee28e47
+2025-08-22 14:47:42.095 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: 339dae00-56d1-4cc2-b7c8-316a0ee28e47
+2025-08-22 14:47:53.379 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 14:47:53.380 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Watermark apply completed for session 339dae00-56d1-4cc2-b7c8-316a0ee28e47
+2025-08-22 14:47:53.380 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Starting watermark processing for session 339dae00-56d1-4cc2-b7c8-316a0ee28e47, job 1d5b65d4-0211-4b31-9b66-b8d90e90dfc8
+2025-08-22 14:47:53.381 [zio-default-blocking-3] WARN  c.p.s.L.PdfProcessingServiceLive - Watermark application needs actual file path - placeholder implementation
+2025-08-22 14:48:02.909 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:48:02.909 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:50:01.013 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:50:01.322 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:50:01.324 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:50:01.408 [ZScheduler-Worker-0] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:50:01.412 [ZScheduler-Worker-0] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:50:01.420 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:50:01.421 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:50:02.538 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:50:02.540 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:50:02.621 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:50:19.984 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:50:19.985 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 14:53:51.583 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 14:53:51.680 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 14:53:51.680 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 14:53:51.691 [ZScheduler-Worker-2] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 14:53:51.693 [ZScheduler-Worker-2] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 14:53:51.695 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 14:53:51.695 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 14:53:52.503 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 14:53:52.504 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 14:53:52.532 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 14:53:56.054 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 14:53:56.074 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:53:56.074 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 14:54:02.625 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 14:54:02.798 [ZScheduler-Worker-6] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755863642796-ea35b322.PDF
+2025-08-22 14:54:02.812 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755863642796-ea35b322.PDF
+2025-08-22 14:54:02.864 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755863642796-ea35b322.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 14:54:02.883 [ZScheduler-Worker-6] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.053S - Success: true
+2025-08-22 14:54:02.884 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:03.904 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:12.320 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 14:54:12.362 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Watermark apply completed for session 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:12.362 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Starting watermark processing for session 5f3861f0-d595-42f5-9e38-0868af2c36b5, job 0e226d39-13b0-4f18-bc7e-40433eb0aba6
+2025-08-22 14:54:12.364 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Applying watermarks from /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755863642796-ea35b322.PDF to /Users/anton/IdeaProjects/pdf-watermarks/./tmp/processed-1755863652364-02f4fda3-upload-1755863642796-ea35b322.PDF
+2025-08-22 14:54:12.385 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:12.525 [zio-default-blocking-1] INFO  c.p.logging.StructuredLogging - Performance: watermark_apply_all completed in PT0.154S - Success: true
+2025-08-22 14:54:12.525 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Watermark application completed successfully for upload-1755863642796-ea35b322.PDF
+2025-08-22 14:54:12.525 [zio-default-blocking-1] INFO  com.pdfwatermarks.http.HttpServer - Watermark processing completed for job 0e226d39-13b0-4f18-bc7e-40433eb0aba6
+2025-08-22 14:54:12.900 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:13.408 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:13.917 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:14.426 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:14.935 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:15.443 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:15.954 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:16.463 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:16.971 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:17.480 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:17.988 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:18.496 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:19.003 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:19.507 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:20.010 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:20.516 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:21.026 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:21.534 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:22.043 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:22.553 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:23.062 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:23.570 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:24.077 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:24.584 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:25.093 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:25.602 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:26.110 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:26.617 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:27.125 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:27.634 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:28.141 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:28.649 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:29.154 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:29.658 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:30.166 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:30.672 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:31.178 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:31.683 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:32.188 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:32.696 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:33.203 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:33.712 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:34.223 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:34.730 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:35.237 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:35.744 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:36.249 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:36.753 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:37.257 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:37.763 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:38.268 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:38.774 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:39.280 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:39.786 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:40.294 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:40.801 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:41.306 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:41.813 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:42.319 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:54:42.825 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 5f3861f0-d595-42f5-9e38-0868af2c36b5
+2025-08-22 14:56:19.629 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 14:57:38.152 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 14:57:38.153 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 15:03:35.688 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 15:03:36.019 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 15:03:36.019 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 15:03:36.084 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 15:03:36.088 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 15:03:36.098 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 15:03:36.099 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 15:03:37.178 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 15:03:37.180 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 15:03:37.248 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 15:04:05.805 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 15:04:05.809 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 15:04:49.328 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 15:04:49.423 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 15:04:49.423 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 15:04:49.434 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 15:04:49.435 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 15:04:49.437 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 15:04:49.437 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 15:04:50.194 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 15:04:50.195 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 15:04:50.217 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 15:04:55.212 [ZScheduler-Worker-5] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 15:04:55.239 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 15:04:55.240 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 15:05:00.692 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 15:05:00.880 [ZScheduler-Worker-2] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755864300879-7e7b897b.PDF
+2025-08-22 15:05:00.900 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755864300879-7e7b897b.PDF
+2025-08-22 15:05:00.951 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755864300879-7e7b897b.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 15:05:00.969 [ZScheduler-Worker-2] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.052S - Success: true
+2025-08-22 15:05:00.971 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:01.994 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:06.498 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 15:05:06.539 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Watermark apply completed for session 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:06.539 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Starting watermark processing for session 1aaf84b8-17ec-4358-becc-4722edd50c7c, job 3d77b229-e7b7-4af2-8279-957156963dc8
+2025-08-22 15:05:06.541 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Applying watermarks from /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755864300879-7e7b897b.PDF to /Users/anton/IdeaProjects/pdf-watermarks/./tmp/processed-1755864306541-e734b020-upload-1755864300879-7e7b897b.PDF
+2025-08-22 15:05:06.561 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:06.708 [zio-default-blocking-1] INFO  c.p.logging.StructuredLogging - Performance: watermark_apply_all completed in PT0.162S - Success: true
+2025-08-22 15:05:06.708 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Watermark application completed successfully for upload-1755864300879-7e7b897b.PDF
+2025-08-22 15:05:06.709 [zio-default-blocking-1] INFO  com.pdfwatermarks.http.HttpServer - Watermark processing completed for job 3d77b229-e7b7-4af2-8279-957156963dc8
+2025-08-22 15:05:07.079 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:08.487 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Download requested for session: 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:08.493 [ZScheduler-Worker-1] ERROR com.pdfwatermarks.http.HttpServer - Download failed: DocumentNotFound(Processed file not found for session 1aaf84b8-17ec-4358-becc-4722edd50c7c)
+2025-08-22 15:05:27.925 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Download requested for session: 1aaf84b8-17ec-4358-becc-4722edd50c7c
+2025-08-22 15:05:27.927 [ZScheduler-Worker-7] ERROR com.pdfwatermarks.http.HttpServer - Download failed: DocumentNotFound(Processed file not found for session 1aaf84b8-17ec-4358-becc-4722edd50c7c)
+2025-08-22 15:12:03.944 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 15:12:04.251 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 15:12:04.251 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 15:12:04.325 [ZScheduler-Worker-1] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 15:12:04.329 [ZScheduler-Worker-1] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 15:12:04.342 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 15:12:04.345 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 15:12:05.418 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 15:12:05.420 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 15:12:07.620 [ZScheduler-Worker-11] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
+2025-08-22 15:12:24.240 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 15:12:24.241 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 15:12:43.473 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 15:12:43.778 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 15:12:43.779 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 15:12:43.853 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 15:12:43.857 [ZScheduler-Worker-6] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 15:12:43.867 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 15:12:43.869 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 15:12:44.893 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 15:12:44.895 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 15:12:44.963 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 15:13:04.630 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 15:13:04.632 [ZScheduler-Worker-6] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed
+2025-08-22 15:13:54.342 [ZScheduler-Worker-0] INFO  com.pdfwatermarks.PdfWatermarkApp - Starting PDF Watermarking Application
+2025-08-22 15:13:54.436 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Configuring HTTP server on 0.0.0.0:8080
+2025-08-22 15:13:54.436 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Max request size: 57671680 bytes
+2025-08-22 15:13:54.448 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Initializing temporary file directory: ./tmp
+2025-08-22 15:13:54.449 [ZScheduler-Worker-9] INFO  c.p.s.TempFileManagementServiceLive - Temporary file directory initialized successfully
+2025-08-22 15:13:54.451 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Temporary file management service initialized
+2025-08-22 15:13:54.452 [ZScheduler-Worker-4] INFO  com.pdfwatermarks.PdfWatermarkApp - Application services initialized successfully
+2025-08-22 15:13:55.126 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting HTTP server on 0.0.0.0:8080
+2025-08-22 15:13:55.126 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Starting the server...
+2025-08-22 15:13:55.153 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Server started
+2025-08-22 15:14:01.609 [ZScheduler-Worker-2] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /
+2025-08-22 15:14:01.640 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/css/styles.css
+2025-08-22 15:14:01.643 [ZScheduler-Worker-13] INFO  com.pdfwatermarks.http.HttpServer - HTTP GET /static/js/app.js
+2025-08-22 15:14:05.151 [ZScheduler-Worker-11] INFO  com.pdfwatermarks.http.HttpServer - Received file upload request from /0:0:0:0:0:0:0:1
+2025-08-22 15:14:05.345 [ZScheduler-Worker-3] DEBUG c.p.s.TempFileManagementServiceLive - Created temporary file: /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755864845344-40ae0a5e.PDF
+2025-08-22 15:14:05.365 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.pdf.PdfProcessor - Loading PDF file: upload-1755864845344-40ae0a5e.PDF
+2025-08-22 15:14:05.418 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.pdf.PdfProcessor - Successfully loaded PDF: upload-1755864845344-40ae0a5e.PDF, pages: 2, size: 5501978 bytes
+2025-08-22 15:14:05.436 [ZScheduler-Worker-3] INFO  c.p.logging.StructuredLogging - Performance: pdf_load_and_validate completed in PT0.054S - Success: true
+2025-08-22 15:14:05.437 [ZScheduler-Worker-3] INFO  com.pdfwatermarks.http.HttpServer - File upload successful: JetBrains AI Leaflet.PDF (5501978 bytes) in session 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:06.458 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Progress check requested for session: 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:12.797 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Received watermark apply request from /0:0:0:0:0:0:0:1
+2025-08-22 15:14:12.843 [ZScheduler-Worker-9] INFO  com.pdfwatermarks.http.HttpServer - Starting watermark processing for session 3cb9512b-1e7e-45d0-9e21-72566761636f, job 30f468f0-86d5-4391-8316-158722cb1702
+2025-08-22 15:14:12.843 [ZScheduler-Worker-10] INFO  com.pdfwatermarks.http.HttpServer - Watermark apply completed for session 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:12.845 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Applying watermarks from /Users/anton/IdeaProjects/pdf-watermarks/./tmp/upload-1755864845344-40ae0a5e.PDF to /Users/anton/IdeaProjects/pdf-watermarks/./tmp/processed-1755864852845-96a87fc4-upload-1755864845344-40ae0a5e.PDF
+2025-08-22 15:14:12.863 [ZScheduler-Worker-7] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:12.992 [zio-default-blocking-1] INFO  c.p.logging.StructuredLogging - Performance: watermark_apply_all completed in PT0.144S - Success: true
+2025-08-22 15:14:12.993 [zio-default-blocking-1] INFO  c.p.s.L.PdfProcessingServiceLive - Watermark application completed successfully for upload-1755864845344-40ae0a5e.PDF
+2025-08-22 15:14:12.994 [zio-default-blocking-1] INFO  com.pdfwatermarks.http.HttpServer - Watermark processing completed for job 30f468f0-86d5-4391-8316-158722cb1702
+2025-08-22 15:14:13.377 [ZScheduler-Worker-12] INFO  com.pdfwatermarks.http.HttpServer - Status check requested for session: 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:14.870 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Download requested for session: 3cb9512b-1e7e-45d0-9e21-72566761636f
+2025-08-22 15:14:14.888 [ZScheduler-Worker-8] INFO  com.pdfwatermarks.http.HttpServer - Starting streaming download for session 3cb9512b-1e7e-45d0-9e21-72566761636f: watermarked_upload-1755864845344-40ae0a5e.PDF (5471230 bytes)
+2025-08-22 15:14:36.081 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - Initiating graceful server shutdown...
+2025-08-22 15:14:36.081 [ZScheduler-Worker-1] INFO  com.pdfwatermarks.http.HttpServer - HTTP server shutdown completed

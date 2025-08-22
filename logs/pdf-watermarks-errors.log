@@ -1,0 +1,14 @@
+2025-08-22 13:46:25.010 [ZScheduler-Worker-9] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
+2025-08-22 14:08:08.207 [ZScheduler-Worker-8] ERROR com.pdfwatermarks.http.HttpServer - File upload failed: InternalError(Failed to create temp file: ./tmp/upload-1755860888203-9dd16f2a.PDF)
+2025-08-22 14:14:02.800 [ZScheduler-Worker-3] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
+2025-08-22 14:31:59.815 [ZScheduler-Worker-11] ERROR com.pdfwatermarks.http.HttpServer - Watermark apply failed: InvalidConfiguration(List(Invalid JSON: .config.position(invalid disambiguator)))
+2025-08-22 14:37:44.113 [ZScheduler-Worker-8] ERROR com.pdfwatermarks.http.HttpServer - Watermark apply failed: SessionNotFound(test-session)
+2025-08-22 15:05:08.493 [ZScheduler-Worker-1] ERROR com.pdfwatermarks.http.HttpServer - Download failed: DocumentNotFound(Processed file not found for session 1aaf84b8-17ec-4358-becc-4722edd50c7c)
+2025-08-22 15:05:27.927 [ZScheduler-Worker-7] ERROR com.pdfwatermarks.http.HttpServer - Download failed: DocumentNotFound(Processed file not found for session 1aaf84b8-17ec-4358-becc-4722edd50c7c)
+2025-08-22 15:12:07.620 [ZScheduler-Worker-11] ERROR zio-slf4j-logger - 
+zio.FiberFailure: bind(..) failed: Address already in use
+Caused by: io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
