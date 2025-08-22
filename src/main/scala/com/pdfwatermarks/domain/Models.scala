@@ -25,6 +25,7 @@ case class PdfDocument(
   pageCount: Int,
   uploadedAt: Instant,
   status: DocumentStatus,
+  sourceFilePath: Option[String] = None,
   processedFilePath: Option[String] = None
 )
 
@@ -640,7 +641,9 @@ case class JobStatusResponse(
   status: String,
   progress: Int, // 0-100 percentage
   message: String,
-  downloadUrl: Option[String] = None
+  downloadUrl: Option[String] = None,
+  filename: Option[String] = None,
+  filesize: Option[Long] = None
 )
 
 given JsonCodec[JobStatusResponse] = DeriveJsonCodec.gen[JobStatusResponse]

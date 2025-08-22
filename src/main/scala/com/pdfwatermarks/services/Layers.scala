@@ -110,20 +110,17 @@ object Layers {
       
       for {
         // Get the actual source file path from the document
-        sourceFile <- ZIO.attemptBlocking {
-          // Try to find the uploaded file in the temp directory
-          val possiblePaths = List(
-            new java.io.File(s"./tmp/${document.id}.pdf"),
-            new java.io.File(s"./tmp/upload-${document.id}"),
-            new java.io.File(s"./tmp/${document.filename}"),
-            new java.io.File(s"tmp/${document.filename}"),
-            new java.io.File(document.filename) // Last resort - direct filename
-          )
-          
-          possiblePaths.find(_.exists()).getOrElse {
-            throw new java.io.FileNotFoundException(s"Could not find uploaded file for document ${document.id}")
+        sourceFile <- ZIO.fromOption(document.sourceFilePath)
+          .orElseFail(DomainError.InternalError(s"No source file path stored for document ${document.id}"))
+          .flatMap { sourcePath =>
+            ZIO.attemptBlocking {
+              val file = new java.io.File(sourcePath)
+              if (!file.exists()) {
+                throw new java.io.FileNotFoundException(s"Source file not found at: $sourcePath")
+              }
+              file
+            }.mapError(err => DomainError.InternalError(s"Failed to locate source file: ${err.getMessage}"))
           }
-        }.mapError(err => DomainError.InternalError(s"Failed to locate source file: ${err.getMessage}"))
         
         // Create a temporary file for the watermarked output
         outputFile <- ZIO.attemptBlocking {
@@ -649,8 +646,14 @@ object Layers {
     override def cleanupTempFiles(files: List[java.io.File]): UIO[Unit] =
       ZIO.succeed(()) // TODO: Implement file cleanup
 
-    override def generateProcessedFilename(originalFilename: String): UIO[String] =
-      ZIO.succeed(s"watermarked_$originalFilename")
+    override def generateProcessedFilename(originalFilename: String): UIO[String] = {
+      val baseName = if (originalFilename.toLowerCase.endsWith(".pdf")) {
+        originalFilename.dropRight(4) // Remove .pdf extension
+      } else {
+        originalFilename
+      }
+      ZIO.succeed(s"${baseName}_watermark.pdf")
+    }
   }
 
   /**

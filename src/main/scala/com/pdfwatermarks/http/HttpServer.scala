@@ -533,14 +533,35 @@ object HttpServer {
                 progress = 50,
                 message = "Processing watermarks..."
               )
-              case DocumentStatus.Completed => JobStatusResponse(
-                sessionId = sessionId,
-                jobId = sessionId,
-                status = "completed",
-                progress = 100,
-                message = "Watermark processing completed",
-                downloadUrl = Some(s"/api/download/$sessionId")
-              )
+              case DocumentStatus.Completed =>
+                // Generate processed filename - implement the same logic as FileManagementService
+                val processedFilename = {
+                  val baseName = if (doc.filename.toLowerCase.endsWith(".pdf")) {
+                    doc.filename.dropRight(4) // Remove .pdf extension
+                  } else {
+                    doc.filename
+                  }
+                  s"${baseName}_watermark.pdf"
+                }
+                
+                // Get file size from processed file if available
+                val fileSize = doc.processedFilePath.flatMap { filePath =>
+                  scala.util.Try {
+                    val file = new java.io.File(filePath)
+                    if (file.exists()) Some(file.length()) else None
+                  }.toOption.flatten
+                }
+                
+                JobStatusResponse(
+                  sessionId = sessionId,
+                  jobId = sessionId,
+                  status = "completed",
+                  progress = 100,
+                  message = "Watermark processing completed",
+                  downloadUrl = Some(s"/api/download/$sessionId"),
+                  filename = Some(processedFilename),
+                  filesize = fileSize
+                )
               case DocumentStatus.Failed(reason) => JobStatusResponse(
                 sessionId = sessionId,
                 jobId = sessionId,
@@ -629,8 +650,12 @@ object HttpServer {
         // Store uploaded file using FileManagementService
         storedFile <- FileManagementService.storeUploadedFile(uploadInfo)
         
-        // Load PDF document and get metadata
-        pdfDocument <- PdfProcessingService.loadPdf(storedFile)
+        // Load PDF document and get metadata, then override filename with original and store source path
+        basePdfDocument <- PdfProcessingService.loadPdf(storedFile)
+        pdfDocument = basePdfDocument.copy(
+          filename = uploadInfo.filename,
+          sourceFilePath = Some(storedFile.getAbsolutePath)
+        )
         
         // Update session with uploaded document
         updatedSession <- SessionManagementService.updateSessionWithDocument(session.sessionId, pdfDocument)
