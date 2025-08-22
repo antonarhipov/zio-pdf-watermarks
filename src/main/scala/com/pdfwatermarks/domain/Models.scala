@@ -3,6 +3,7 @@ package com.pdfwatermarks.domain
 import java.awt.Color
 import java.io.File
 import java.time.Instant
+import zio.json.*
 
 /**
  * Core domain models for the PDF Watermarking Application.
@@ -213,3 +214,63 @@ enum DomainError:
   case SessionNotFound(sessionId: String)
   case DocumentNotFound(documentId: String)
   case InternalError(message: String)
+
+// ========== JSON Serialization ==========
+
+/**
+ * JSON encoders and decoders for HTTP API integration.
+ */
+
+// Custom Color JSON codec
+given JsonCodec[Color] = JsonCodec(
+  JsonEncoder.int.contramap[Color](_.getRGB),
+  JsonDecoder.int.map(rgb => new Color(rgb, true))
+)
+
+// Point JSON codec
+given JsonCodec[Point] = DeriveJsonCodec.gen[Point]
+
+// Position configuration JSON codec
+given JsonCodec[PositionConfig] = DeriveJsonCodec.gen[PositionConfig]
+
+// Orientation configuration JSON codec  
+given JsonCodec[OrientationConfig] = DeriveJsonCodec.gen[OrientationConfig]
+
+// Font size configuration JSON codec
+given JsonCodec[FontSizeConfig] = DeriveJsonCodec.gen[FontSizeConfig]
+
+// Color configuration JSON codec
+given JsonCodec[ColorConfig] = DeriveJsonCodec.gen[ColorConfig]
+
+// Watermark configuration JSON codec
+given JsonCodec[WatermarkConfig] = DeriveJsonCodec.gen[WatermarkConfig]
+
+// Processing request model for HTTP API
+case class ProcessWatermarkRequest(
+  sessionId: String,
+  config: WatermarkConfig
+)
+
+given JsonCodec[ProcessWatermarkRequest] = DeriveJsonCodec.gen[ProcessWatermarkRequest]
+
+// Processing response model for HTTP API
+case class ProcessWatermarkResponse(
+  success: Boolean,
+  sessionId: String,
+  jobId: Option[String] = None,
+  message: String
+)
+
+given JsonCodec[ProcessWatermarkResponse] = DeriveJsonCodec.gen[ProcessWatermarkResponse]
+
+// Job status response for HTTP API
+case class JobStatusResponse(
+  sessionId: String,
+  jobId: String,
+  status: String,
+  progress: Int, // 0-100 percentage
+  message: String,
+  downloadUrl: Option[String] = None
+)
+
+given JsonCodec[JobStatusResponse] = DeriveJsonCodec.gen[JobStatusResponse]

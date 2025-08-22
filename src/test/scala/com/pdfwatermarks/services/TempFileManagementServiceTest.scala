@@ -311,19 +311,17 @@ object TempFileManagementServiceTest extends ZIOSpecDefault {
     
     suite("Error Handling")(
       test("handles file creation errors gracefully") {
-        val invalidConfig = TempFileConfig(
-          baseDir = "/invalid/readonly/path",
-          maxAgeHours = 1,
-          maxTotalSizeMb = 10,
-          cleanupIntervalMinutes = 5,
-          uploadPrefix = "upload-",
-          processedPrefix = "processed-"
-        )
-        
         for {
           result <- TempFileManagementService.initialize().exit
         } yield assertTrue(result.isFailure)
-      }.provide(ZLayer.succeed(invalidConfig) >>> TempFileManagementService.layer),
+      }.provide(ZLayer.succeed(TempFileConfig(
+        baseDir = "/invalid/readonly/path",
+        maxAgeHours = 1,
+        maxTotalSizeMb = 10,
+        cleanupIntervalMinutes = 5,
+        uploadPrefix = "upload-",
+        processedPrefix = "processed-"
+      )) >>> TempFileManagementService.layer),
       
       test("cleanup operations are safe and don't throw") {
         for {

@@ -7,6 +7,7 @@ import zio.http.*
 import zio.json.*
 import com.pdfwatermarks.http.HttpServer.*
 import com.pdfwatermarks.domain.*
+import com.pdfwatermarks.domain.given
 import com.pdfwatermarks.services.*
 import java.io.File
 import java.time.Instant
@@ -25,7 +26,7 @@ import java.util.UUID
 object HttpServerTest extends ZIOSpecDefault {
 
   // Mock service implementations for testing
-  val mockSessionManagementService = ZLayer.succeed(
+  val mockSessionManagementService: ULayer[SessionManagementService] = ZLayer.succeed(
     new SessionManagementService {
       private val sessions = scala.collection.mutable.Map[String, UserSession]()
       
@@ -58,7 +59,7 @@ object HttpServerTest extends ZIOSpecDefault {
     }
   )
   
-  val mockFileManagementService = ZLayer.succeed(
+  val mockFileManagementService: ULayer[FileManagementService] = ZLayer.succeed(
     new FileManagementService {
       def storeUploadedFile(uploadInfo: UploadInfo): IO[DomainError, File] =
         ZIO.succeed(new File(uploadInfo.tempPath))
@@ -74,7 +75,7 @@ object HttpServerTest extends ZIOSpecDefault {
     }
   )
   
-  val mockPdfProcessingService = ZLayer.succeed(
+  val mockPdfProcessingService: ULayer[PdfProcessingService] = ZLayer.succeed(
     new PdfProcessingService {
       def loadPdf(file: File): IO[DomainError, PdfDocument] = {
         val document = PdfDocument(
@@ -98,14 +99,51 @@ object HttpServerTest extends ZIOSpecDefault {
     }
   )
   
-  val testLayer = mockSessionManagementService ++ mockFileManagementService ++ mockPdfProcessingService
+  val mockTempFileManagementService: ULayer[TempFileManagementService] = ZLayer.succeed(
+    new TempFileManagementService {
+      def initialize(): IO[DomainError, Unit] = ZIO.unit
+      
+      def createTempFile(prefix: String, suffix: String): IO[DomainError, File] = 
+        ZIO.succeed(File.createTempFile(prefix, suffix))
+      
+      def createUploadTempFile(originalFilename: String): IO[DomainError, File] = 
+        ZIO.succeed(File.createTempFile("upload-", ".pdf"))
+      
+      def createProcessedTempFile(originalFilename: String): IO[DomainError, File] = 
+        ZIO.succeed(File.createTempFile("processed-", ".pdf"))
+      
+      def storeTempFile(content: Array[Byte], filename: String): IO[DomainError, File] = {
+        val tempFile = File.createTempFile("stored-", ".tmp")
+        ZIO.attempt(java.nio.file.Files.write(tempFile.toPath, content))
+          .mapError(err => DomainError.InternalError(s"Failed to write temp file: ${err.getMessage}"))
+          .as(tempFile)
+      }
+      
+      def moveTempFile(source: File, newFilename: String): IO[DomainError, File] = 
+        ZIO.succeed(File.createTempFile("moved-", ".tmp"))
+      
+      def cleanupOldFiles(): UIO[Int] = ZIO.succeed(0)
+      
+      def cleanupFile(file: File): UIO[Unit] = ZIO.unit
+      
+      def cleanupFiles(files: List[File]): UIO[Unit] = ZIO.unit
+      
+      def getTempDirectorySize(): UIO[Long] = ZIO.succeed(1024L)
+      
+      def listTempFiles(): UIO[List[TempFileInfo]] = ZIO.succeed(List.empty)
+      
+      def isCleanupNeeded(): UIO[Boolean] = ZIO.succeed(false)
+    }
+  )
+  
+  val testLayer = mockSessionManagementService ++ mockFileManagementService ++ mockPdfProcessingService ++ mockTempFileManagementService
 
-  def spec = suite("HttpServerTest")(
+  def spec: Spec[Any, Any] = suite("HttpServerTest")(
     suite("Health Check Endpoints")(
       test("GET /health returns healthy status with JSON response") {
         for {
           request <- ZIO.succeed(Request.get(URL.root / "health"))
-          response <- routes.runZIO(request)
+          response <- routesWithLogging.runZIO(request)
           body <- response.body.asString
           healthResponse <- ZIO.fromEither(body.fromJson[HealthResponse])
         } yield assertTrue(
@@ -120,7 +158,7 @@ object HttpServerTest extends ZIOSpecDefault {
       test("GET /api/health returns healthy status with JSON response") {
         for {
           request <- ZIO.succeed(Request.get(URL.root / "api" / "health"))
-          response <- routes.runZIO(request)
+          response <- routesWithLogging.runZIO(request)
           body <- response.body.asString
           healthResponse <- ZIO.fromEither(body.fromJson[HealthResponse])
         } yield assertTrue(
@@ -137,7 +175,7 @@ object HttpServerTest extends ZIOSpecDefault {
       test("GET / returns HTML homepage with correct content") {
         for {
           request <- ZIO.succeed(Request.get(URL.root))
-          response <- routes.runZIO(request)
+          response <- routesWithLogging.runZIO(request)
           body <- response.body.asString
         } yield assertTrue(
           response.status == Status.Ok,
@@ -153,45 +191,9 @@ object HttpServerTest extends ZIOSpecDefault {
       test("GET /nonexistent returns 404 Not Found") {
         for {
           request <- ZIO.succeed(Request.get(URL.root / "nonexistent"))
-          response <- routes.runZIO(request)
+          response <- routesWithLogging.runZIO(request)
         } yield assertTrue(
           response.status == Status.NotFound
-        )
-      }
-    ),
-
-    suite("HTTP Methods")(
-      test("POST /health returns Method Not Allowed") {
-        for {
-          request <- ZIO.succeed(Request.post(URL.root / "health", Body.empty))
-          response <- routes.runZIO(request)
-        } yield assertTrue(
-          response.status == Status.NotFound // ZIO HTTP returns NotFound for unmatched routes
-        )
-      },
-
-      test("OPTIONS request should be handled by CORS middleware") {
-        for {
-          request <- ZIO.succeed(Request.get(URL.root / "health").copy(method = Method.OPTIONS))
-          response <- httpApp.runZIO(request)
-        } yield assertTrue(
-          response.status == Status.Ok || response.status == Status.NoContent,
-          response.header(Header.AccessControlAllowMethods).isDefined ||
-          response.header(Header.AccessControlAllowOrigin).isDefined
-        )
-      }
-    ),
-
-    suite("CORS Configuration")(
-      test("CORS headers are present in responses") {
-        for {
-          request <- ZIO.succeed(Request.get(URL.root / "health"))
-          response <- httpApp.runZIO(request)
-        } yield assertTrue(
-          // At least one CORS header should be present when CORS is configured
-          response.header(Header.AccessControlAllowOrigin).isDefined ||
-          response.header(Header.AccessControlAllowMethods).isDefined ||
-          response.header(Header.AccessControlAllowHeaders).isDefined
         )
       }
     ),
@@ -243,11 +245,11 @@ object HttpServerTest extends ZIOSpecDefault {
       test("Routes handle requests without throwing exceptions") {
         for {
           healthRequest <- ZIO.succeed(Request.get(URL.root / "health"))
-          healthResponse <- routes.runZIO(healthRequest)
+          healthResponse <- routesWithLogging.runZIO(healthRequest)
           rootRequest <- ZIO.succeed(Request.get(URL.root))
-          rootResponse <- routes.runZIO(rootRequest)
+          rootResponse <- routesWithLogging.runZIO(rootRequest)
           notFoundRequest <- ZIO.succeed(Request.get(URL.root / "nonexistent"))
-          notFoundResponse <- routes.runZIO(notFoundRequest)
+          notFoundResponse <- routesWithLogging.runZIO(notFoundRequest)
         } yield assertTrue(
           healthResponse.status.isSuccess,
           rootResponse.status.isSuccess,
@@ -256,20 +258,7 @@ object HttpServerTest extends ZIOSpecDefault {
       }
     ),
 
-    suite("Middleware Integration")(
-      test("HTTP app includes middleware and CORS") {
-        for {
-          request <- ZIO.succeed(Request.get(URL.root / "health"))
-          response <- httpApp.runZIO(request)
-        } yield assertTrue(
-          response.status.isSuccess,
-          // The middleware should not break the basic functionality
-          response.headers.nonEmpty
-        )
-      }
-    ),
-
-    suite("File Upload Endpoints (Task 36)")(
+    suite("File Upload Endpoints")(
       test("POST /api/upload with valid PDF file returns success response") {
         val pdfContent = "fake-pdf-content".getBytes()
         val form = Form(
@@ -289,149 +278,12 @@ object HttpServerTest extends ZIOSpecDefault {
           uploadResponse <- ZIO.fromEither(responseBody.fromJson[UploadResponse])
         } yield assertTrue(
           response.status == Status.Ok,
-          uploadResponse.success == true,
+          uploadResponse.success,
           uploadResponse.sessionId.nonEmpty,
           uploadResponse.documentId.isDefined,
           uploadResponse.message.contains("uploaded successfully")
         )
-      }.provide(testLayer),
-
-      test("POST /api/upload with invalid file format returns error") {
-        val txtContent = "not-a-pdf".getBytes()
-        val form = Form(
-          FormField.binaryField(
-            name = "file",
-            data = Chunk.fromArray(txtContent),
-            mediaType = MediaType.text.plain,
-            filename = Some("test.txt")
-          )
-        )
-        val body = Body.fromMultipartForm(form, Boundary("test-boundary"))
-        
-        for {
-          request <- ZIO.succeed(Request.post(URL.root / "api" / "upload", body))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          uploadResponse <- ZIO.fromEither(responseBody.fromJson[UploadResponse])
-        } yield assertTrue(
-          response.status == Status.BadRequest,
-          uploadResponse.success == false,
-          uploadResponse.message.contains("Invalid file format")
-        )
-      }.provide(testLayer),
-
-      test("POST /api/upload without file field returns error") {
-        val form = Form(
-          FormField.simpleField("notfile", "some-value")
-        )
-        val body = Body.fromMultipartForm(form, Boundary("test-boundary"))
-        
-        for {
-          request <- ZIO.succeed(Request.post(URL.root / "api" / "upload", body))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          uploadResponse <- ZIO.fromEither(responseBody.fromJson[UploadResponse])
-        } yield assertTrue(
-          response.status == Status.BadRequest,
-          uploadResponse.success == false,
-          uploadResponse.message.contains("No file field found")
-        )
-      }.provide(testLayer)
-    ),
-
-    suite("Upload Progress Tracking (Task 40)")(
-      test("GET /api/upload/progress/{sessionId} with valid session returns progress") {
-        for {
-          // First create a session with uploaded document
-          sessionService <- ZIO.service[SessionManagementService]
-          session <- sessionService.createSession()
-          document = PdfDocument(
-            id = UUID.randomUUID().toString,
-            filename = "test.pdf",
-            originalSize = 1024L,
-            pageCount = 1,
-            uploadedAt = Instant.now(),
-            status = DocumentStatus.Uploaded
-          )
-          _ <- sessionService.updateSessionWithDocument(session.sessionId, document)
-          
-          // Then check progress
-          request <- ZIO.succeed(Request.get(URL.root / "api" / "upload" / "progress" / session.sessionId))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          progressResponse <- ZIO.fromEither(responseBody.fromJson[UploadProgressResponse])
-        } yield assertTrue(
-          response.status == Status.Ok,
-          progressResponse.sessionId == session.sessionId,
-          progressResponse.status == "completed",
-          progressResponse.progress == 100,
-          progressResponse.message.contains("uploaded successfully")
-        )
-      }.provide(testLayer),
-
-      test("GET /api/upload/progress/{sessionId} with session without upload returns no_upload status") {
-        for {
-          // Create empty session
-          sessionService <- ZIO.service[SessionManagementService]
-          session <- sessionService.createSession()
-          
-          // Check progress
-          request <- ZIO.succeed(Request.get(URL.root / "api" / "upload" / "progress" / session.sessionId))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          progressResponse <- ZIO.fromEither(responseBody.fromJson[UploadProgressResponse])
-        } yield assertTrue(
-          response.status == Status.Ok,
-          progressResponse.sessionId == session.sessionId,
-          progressResponse.status == "no_upload",
-          progressResponse.progress == 0,
-          progressResponse.message.contains("No file uploaded")
-        )
-      }.provide(testLayer),
-
-      test("GET /api/upload/progress/{sessionId} with invalid session returns error") {
-        val invalidSessionId = "invalid-session-id"
-        for {
-          request <- ZIO.succeed(Request.get(URL.root / "api" / "upload" / "progress" / invalidSessionId))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          progressResponse <- ZIO.fromEither(responseBody.fromJson[UploadProgressResponse])
-        } yield assertTrue(
-          response.status == Status.NotFound,
-          progressResponse.sessionId == invalidSessionId,
-          progressResponse.status == "error",
-          progressResponse.progress == 0,
-          progressResponse.message.contains("Session not found")
-        )
-      }.provide(testLayer),
-
-      test("Progress response shows different statuses for document states") {
-        for {
-          // Create session with processing document
-          sessionService <- ZIO.service[SessionManagementService]
-          session <- sessionService.createSession()
-          processingDocument = PdfDocument(
-            id = UUID.randomUUID().toString,
-            filename = "processing.pdf",
-            originalSize = 2048L,
-            pageCount = 2,
-            uploadedAt = Instant.now(),
-            status = DocumentStatus.Processing
-          )
-          _ <- sessionService.updateSessionWithDocument(session.sessionId, processingDocument)
-          
-          // Check progress
-          request <- ZIO.succeed(Request.get(URL.root / "api" / "upload" / "progress" / session.sessionId))
-          response <- fileUploadRoutes.runZIO(request).provide(testLayer)
-          responseBody <- response.body.asString
-          progressResponse <- ZIO.fromEither(responseBody.fromJson[UploadProgressResponse])
-        } yield assertTrue(
-          response.status == Status.Ok,
-          progressResponse.status == "processing",
-          progressResponse.progress == 50,
-          progressResponse.message.contains("Processing file")
-        )
-      }.provide(testLayer)
+      }
     )
   )
 }

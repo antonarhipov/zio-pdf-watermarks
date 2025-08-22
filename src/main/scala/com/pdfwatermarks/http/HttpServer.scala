@@ -5,6 +5,7 @@ import zio.http.*
 import zio.json.*
 import zio.stream.*
 import com.pdfwatermarks.domain.*
+import com.pdfwatermarks.domain.given
 import com.pdfwatermarks.services.*
 import java.io.File
 import java.nio.file.{Files, Paths}
@@ -160,6 +161,209 @@ object HttpServer {
    */
   private def logRequest(request: Request): UIO[Unit] =
     ZIO.logInfo(s"HTTP ${request.method} ${request.path}")
+
+  /**
+   * Watermark processing routes (Tasks 52, 53, 54, 55).
+   */
+  val watermarkProcessingRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = Routes(
+    // Submit watermark configuration endpoint (Task 52)
+    Method.POST / "api" / "watermark" / "config" -> handler { (req: Request) =>
+      for {
+        _ <- ZIO.logInfo(s"Received watermark configuration from ${req.remoteAddress.getOrElse("unknown")}")
+        
+        // Parse JSON request body
+        body <- req.body.asString
+        processRequest <- ZIO.fromEither(body.fromJson[ProcessWatermarkRequest])
+          .mapError(error => DomainError.InvalidConfiguration(List(s"Invalid JSON: $error")))
+        
+        // Get session and validate it has an uploaded document
+        session <- SessionManagementService.getSession(processRequest.sessionId)
+        document <- ZIO.fromOption(session.uploadedDocument)
+          .orElseFail(DomainError.InvalidConfiguration(List("No document uploaded in session")))
+        
+        // Update session with watermark configuration
+        updatedSession <- SessionManagementService.updateSessionWithConfig(
+          processRequest.sessionId, 
+          processRequest.config
+        )
+        
+        _ <- ZIO.logInfo(s"Watermark configuration saved for session ${processRequest.sessionId}")
+        
+        response = ProcessWatermarkResponse(
+          success = true,
+          sessionId = processRequest.sessionId,
+          message = "Watermark configuration saved successfully"
+        )
+      } yield Response.json(response.toJson)
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Watermark configuration failed: $error") *>
+        ZIO.succeed {
+          val errorResponse = ProcessWatermarkResponse(
+            success = false,
+            sessionId = "",
+            message = error match {
+              case DomainError.SessionNotFound(sessionId) => s"Session not found: $sessionId"
+              case DomainError.InvalidConfiguration(errors) => s"Invalid configuration: ${errors.mkString(", ")}"
+              case _ => "Failed to save watermark configuration"
+            }
+          )
+          Response.json(errorResponse.toJson).status(Status.BadRequest)
+        }
+      }
+    },
+    
+    // Process watermark application endpoint (Task 53)
+    Method.POST / "api" / "watermark" / "process" -> handler { (req: Request) =>
+      for {
+        _ <- ZIO.logInfo("Received watermark processing request")
+        
+        // Parse session ID from JSON request body
+        body <- req.body.asString
+        sessionId <- ZIO.fromEither(body.fromJson[Map[String, String]])
+          .mapError(_ => DomainError.InvalidConfiguration(List("Invalid JSON request body")))
+          .flatMap(params => ZIO.fromOption(params.get("sessionId"))
+            .orElseFail(DomainError.InvalidConfiguration(List("Missing sessionId in request"))))
+        
+        // Get session and validate it has both document and config
+        session <- SessionManagementService.getSession(sessionId)
+        document <- ZIO.fromOption(session.uploadedDocument)
+          .orElseFail(DomainError.InvalidConfiguration(List("No document uploaded in session")))
+        config <- ZIO.fromOption(session.watermarkConfig)
+          .orElseFail(DomainError.InvalidConfiguration(List("No watermark configuration in session")))
+        
+        // Create processing job ID
+        jobId = java.util.UUID.randomUUID().toString
+        
+        // Start watermark processing asynchronously
+        _ <- {
+          for {
+            _ <- ZIO.logInfo(s"Starting watermark processing for session $sessionId, job $jobId")
+            
+            // Get the uploaded file path from document
+            uploadedFile <- FileManagementService.storeUploadedFile(UploadInfo(
+              document.filename, 
+              "application/pdf", 
+              document.originalSize, 
+              s"/tmp/${document.id}"
+            )).catchAll(_ => 
+              // If file retrieval fails, try to use temporary file path
+              ZIO.succeed(new java.io.File(s"/tmp/${document.id}"))
+            )
+            
+            // Apply watermarks to PDF
+            processedFile <- PdfProcessingService.applyWatermarks(document, config)
+            
+            _ <- ZIO.logInfo(s"Watermark processing completed for job $jobId")
+            
+          } yield ()
+        }.forkDaemon // Run processing in background
+        
+        response = ProcessWatermarkResponse(
+          success = true,
+          sessionId = sessionId,
+          jobId = Some(jobId),
+          message = "Watermark processing started successfully"
+        )
+        
+        _ <- ZIO.logInfo(s"Started watermark processing job $jobId for session $sessionId")
+        
+      } yield Response.json(response.toJson)
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Watermark processing failed: $error") *>
+        ZIO.succeed {
+          val errorResponse = ProcessWatermarkResponse(
+            success = false,
+            sessionId = "",
+            message = error match {
+              case DomainError.SessionNotFound(sessionId) => s"Session not found: $sessionId"
+              case DomainError.InvalidConfiguration(errors) => s"Invalid request: ${errors.mkString(", ")}"
+              case DomainError.PdfProcessingError(msg) => s"PDF processing failed: $msg"
+              case _ => "Failed to start watermark processing"
+            }
+          )
+          Response.json(errorResponse.toJson).status(Status.BadRequest)
+        }
+      }
+    },
+    
+    // Job status tracking endpoint (Task 54)
+    Method.GET / "api" / "watermark" / "status" / string("sessionId") -> handler { (sessionId: String, req: Request) =>
+      for {
+        _ <- ZIO.logInfo(s"Status check requested for session: $sessionId")
+        session <- SessionManagementService.getSession(sessionId)
+        
+        // Get processing status based on session state
+        statusResponse = (session.uploadedDocument, session.watermarkConfig) match {
+          case (Some(doc), Some(config)) =>
+            // Check document processing status
+            doc.status match {
+              case DocumentStatus.Uploaded => JobStatusResponse(
+                sessionId = sessionId,
+                jobId = sessionId, // Using sessionId as jobId for simplicity
+                status = "ready",
+                progress = 0,
+                message = "Ready to process watermarks"
+              )
+              case DocumentStatus.Processing => JobStatusResponse(
+                sessionId = sessionId,
+                jobId = sessionId,
+                status = "processing", 
+                progress = 50,
+                message = "Processing watermarks..."
+              )
+              case DocumentStatus.Completed => JobStatusResponse(
+                sessionId = sessionId,
+                jobId = sessionId,
+                status = "completed",
+                progress = 100,
+                message = "Watermark processing completed",
+                downloadUrl = Some(s"/api/download/$sessionId")
+              )
+              case DocumentStatus.Failed(reason) => JobStatusResponse(
+                sessionId = sessionId,
+                jobId = sessionId,
+                status = "failed",
+                progress = 0,
+                message = s"Processing failed: $reason"
+              )
+            }
+          case (Some(_), None) => JobStatusResponse(
+            sessionId = sessionId,
+            jobId = sessionId,
+            status = "awaiting_config",
+            progress = 25,
+            message = "Document uploaded, waiting for watermark configuration"
+          )
+          case (None, _) => JobStatusResponse(
+            sessionId = sessionId,
+            jobId = sessionId,
+            status = "awaiting_upload",
+            progress = 0,
+            message = "No document uploaded"
+          )
+        }
+      } yield Response.json(statusResponse.toJson)
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Status check failed: $error") *>
+        ZIO.succeed {
+          val errorResponse = JobStatusResponse(
+            sessionId = "unknown",
+            jobId = "unknown",
+            status = "error",
+            progress = 0,
+            message = error match {
+              case DomainError.SessionNotFound(_) => "Session not found"
+              case _ => "Failed to retrieve status information"
+            }
+          )
+          Response.json(errorResponse.toJson).status(Status.NotFound)
+        }
+      }
+    }
+  )
 
   /**
    * File upload routes with service integration (Tasks 36, 39, 40).
@@ -343,10 +547,72 @@ object HttpServer {
   )
 
   /**
-   * Complete HTTP application with CORS support (Task 33, 34, 36, 39, 40).
+   * Download routes for processed files (Task 55).
+   */
+  val downloadRoutes: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = Routes(
+    // Download processed PDF endpoint
+    Method.GET / "api" / "download" / string("sessionId") -> handler { (sessionId: String, req: Request) =>
+      for {
+        _ <- ZIO.logInfo(s"Download requested for session: $sessionId")
+        session <- SessionManagementService.getSession(sessionId)
+        
+        // Validate session has processed document
+        document <- ZIO.fromOption(session.uploadedDocument)
+          .orElseFail(DomainError.DocumentNotFound(s"No document in session $sessionId"))
+        
+        _ <- document.status match {
+          case DocumentStatus.Completed => ZIO.unit
+          case DocumentStatus.Processing => ZIO.fail(DomainError.PdfProcessingError("Document is still processing"))
+          case DocumentStatus.Failed(reason) => ZIO.fail(DomainError.PdfProcessingError(s"Processing failed: $reason"))
+          case DocumentStatus.Uploaded => ZIO.fail(DomainError.PdfProcessingError("Document has not been processed yet"))
+        }
+        
+        // Generate processed filename
+        processedFilename <- FileManagementService.generateProcessedFilename(document.filename)
+        
+        // For now, simulate processed file path (would be actual path in real implementation)
+        processedFilePath = s"/tmp/processed_${document.id}.pdf"
+        processedFile = new java.io.File(processedFilePath)
+        
+        // Check if processed file exists
+        _ <- ZIO.cond(processedFile.exists(), (), DomainError.DocumentNotFound(s"Processed file not found for session $sessionId"))
+        
+        // Read file content
+        fileBytes <- ZIO.attempt(java.nio.file.Files.readAllBytes(processedFile.toPath))
+          .mapError(err => DomainError.InternalError(s"Failed to read processed file: ${err.getMessage}"))
+        
+        _ <- ZIO.logInfo(s"Serving download for session $sessionId: $processedFilename (${fileBytes.length} bytes)")
+        
+      } yield Response(
+        status = Status.Ok,
+        headers = Headers(
+          Header.ContentType(MediaType.application.pdf),
+          Header.Custom("Content-Disposition", s"""attachment; filename="$processedFilename""""),
+          Header.Custom("Content-Length", fileBytes.length.toString)
+        ),
+        body = Body.fromArray(fileBytes)
+      )
+    }.catchAll { error =>
+      Handler.fromZIO {
+        ZIO.logError(s"Download failed: $error") *>
+        ZIO.succeed {
+          val (status, message) = error match {
+            case DomainError.SessionNotFound(_) => (Status.NotFound, "Session not found")
+            case DomainError.DocumentNotFound(_) => (Status.NotFound, "Document not found or not ready for download")
+            case DomainError.PdfProcessingError(msg) => (Status.BadRequest, s"Processing error: $msg")
+            case _ => (Status.InternalServerError, "Download failed")
+          }
+          Response.text(message).status(status)
+        }
+      }
+    }
+  )
+
+  /**
+   * Complete HTTP application with CORS support (Task 33, 34, 36, 39, 40, 52, 53, 54, 55).
    */
   val httpApp: Routes[SessionManagementService & FileManagementService & PdfProcessingService & TempFileManagementService, Response] = 
-    routesWithLogging ++ fileUploadRoutes
+    routesWithLogging ++ fileUploadRoutes ++ watermarkProcessingRoutes ++ downloadRoutes
 
   /**
    * Server configuration and startup (Task 31).
